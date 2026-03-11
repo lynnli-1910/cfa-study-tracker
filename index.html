@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#ff8a65">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>CFA L3 Study Tracker</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+:root {
+  --bg: #fef6f0;
+  --card: #ffffff;
+  --card2: #fff5ee;
+  --accent: #ff8a65;
+  --accent2: #ff6b6b;
+  --green: #66bb6a;
+  --green2: #e8f5e9;
+  --blue: #64b5f6;
+  --purple: #ba68c8;
+  --gold: #ffc107;
+  --text: #3d3d3d;
+  --text2: #999;
+  --border: #f0e0d6;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body {
+  font-family: 'Nunito', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height:100vh; max-width:480px; margin:0 auto;
+  padding-bottom:80px; overflow-x:hidden;
+}
+
+.header { padding:24px 20px 0; text-align:center; }
+.header h1 { font-size:22px; font-weight:800; color:var(--accent); }
+.header .greeting { font-size:14px; color:var(--text2); margin-top:4px; }
+.exam-cd { margin-top:10px; background:linear-gradient(135deg,#ff8a65,#ff6b6b); color:#fff; border-radius:16px; padding:12px; display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:700; box-shadow:0 4px 15px rgba(255,138,101,0.3); }
+.exam-cd .big { font-size:28px; }
+
+.stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; padding:16px 20px; }
+.stat-card { background:var(--card); border-radius:16px; padding:14px 10px; text-align:center; box-shadow:var(--shadow); }
+.stat-card .icon { font-size:24px; }
+.stat-card .num { font-size:22px; font-weight:800; margin:2px 0; }
+.stat-card .label { font-size:11px; color:var(--text2); }
+.sc-streak .num { color:var(--accent2); }
+.sc-hours .num { color:var(--blue); }
+.sc-prog .num { color:var(--green); font-size:16px; }
+
+.daily-goal { margin:0 20px 14px; background:var(--card); border-radius:16px; padding:14px 16px; box-shadow:var(--shadow); }
+.dg-top { display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px; }
+.dg-top .lbl { color:var(--text2); }
+.dg-top .val { font-weight:700; color:var(--accent); }
+.dg-bar { height:10px; background:#fce4d6; border-radius:5px; overflow:hidden; }
+.dg-fill { height:100%; border-radius:5px; background:linear-gradient(90deg,#ff8a65,#66bb6a); transition:width .5s; }
+.dg-msg { font-size:12px; color:var(--green); margin-top:6px; text-align:center; font-weight:600; }
+
+.timer-section { margin:0 20px 14px; background:var(--card); border-radius:20px; padding:20px; text-align:center; box-shadow:var(--shadow); }
+.timer-section select { background:var(--card2); color:var(--text); border:2px solid var(--border); border-radius:12px; padding:8px 14px; font-size:14px; width:100%; outline:none; font-family:inherit; margin-bottom:12px; }
+.timer-display { font-size:48px; font-weight:800; color:var(--accent); letter-spacing:2px; font-variant-numeric:tabular-nums; }
+.timer-btns { display:flex; gap:10px; justify-content:center; margin-top:12px; }
+.timer-btns button { padding:12px 28px; border:none; border-radius:14px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; transition:transform .1s; }
+.timer-btns button:active { transform:scale(.95); }
+.btn-start { background:linear-gradient(135deg,#ff8a65,#ff6b6b); color:#fff; box-shadow:0 4px 15px rgba(255,138,101,0.3); }
+.btn-start.running { background:linear-gradient(135deg,#66bb6a,#4caf50); }
+.btn-manual { background:var(--card2); color:var(--text); border:2px solid var(--border); }
+
+.quote-section { margin:0 20px 14px; padding:16px; background:linear-gradient(135deg,#fff5ee,#fce4ec); border-radius:16px; text-align:center; }
+.quote-text { font-size:13px; font-style:italic; line-height:1.6; color:var(--text); }
+.quote-author { font-size:11px; color:var(--text2); margin-top:4px; }
+
+.ring-section { display:flex; align-items:center; justify-content:center; gap:20px; padding:10px 20px 16px; }
+.ring-box { position:relative; width:100px; height:100px; }
+.ring-box svg { transform:rotate(-90deg); width:100px; height:100px; }
+.ring-bg { fill:none; stroke:#fce4d6; stroke-width:8; }
+.ring-fg { fill:none; stroke:url(#grad1); stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset .8s; }
+.ring-center { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; }
+.ring-center .pct { font-size:22px; font-weight:800; color:var(--accent); }
+.ring-center .sub { font-size:10px; color:var(--text2); }
+.ring-info { font-size:13px; line-height:2.2; }
+.ring-info .done { color:var(--green); font-weight:700; }
+
+/* Subject List */
+.subject-list { padding:12px 20px; }
+.subj-card { background:var(--card); border-radius:16px; padding:14px 16px; margin-bottom:10px; cursor:pointer; box-shadow:var(--shadow); transition:transform .15s; }
+.subj-card:active { transform:scale(.98); }
+.subj-card.done { opacity:.55; }
+.subj-top { display:flex; justify-content:space-between; align-items:center; }
+.subj-name { font-size:15px; font-weight:700; }
+.subj-tag { font-size:11px; padding:3px 10px; border-radius:20px; font-weight:700; }
+.tag-done { background:#e8f5e9; color:#4caf50; }
+.tag-cur { background:#fff3e0; color:#ff8a65; }
+.tag-todo { background:#f5f5f5; color:#bbb; }
+.subj-bar { margin-top:10px; height:8px; background:#fce4d6; border-radius:4px; overflow:hidden; }
+.subj-bar-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,#ff8a65,#66bb6a); transition:width .4s; }
+.subj-meta { display:flex; gap:12px; margin-top:8px; font-size:11px; color:var(--text2); }
+
+/* Detail */
+.detail-header { padding:16px 20px; display:flex; align-items:center; gap:12px; }
+.detail-back { background:var(--card); border:2px solid var(--border); color:var(--text); width:36px; height:36px; border-radius:12px; font-size:18px; cursor:pointer; font-weight:700; }
+.detail-title { font-size:17px; font-weight:800; color:var(--accent); }
+.detail-progress { margin:0 20px 12px; font-size:12px; color:var(--text2); display:flex; justify-content:space-between; }
+.detail-progress span { color:var(--green); font-weight:700; }
+
+.module-card { margin:0 20px 12px; background:var(--card); border-radius:16px; overflow:hidden; box-shadow:var(--shadow); }
+.module-header { padding:14px 16px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; }
+.module-header .name { font-size:14px; font-weight:700; flex:1; }
+.module-header .badge { font-size:11px; color:#fff; background:var(--accent); padding:3px 10px; border-radius:20px; font-weight:700; }
+.module-header .arrow { color:var(--text2); font-size:14px; transition:transform .2s; margin-left:8px; }
+.module-header .arrow.open { transform:rotate(90deg); }
+.module-body { display:none; padding:0 16px 12px; }
+.module-body.show { display:block; }
+.mod-info { font-size:11px; color:var(--text2); margin-bottom:8px; padding-bottom:8px; border-bottom:1px dashed var(--border); }
+
+.lesson-item { display:flex; align-items:center; padding:9px 0; border-bottom:1px solid #fef0e8; gap:10px; }
+.lesson-item:last-child { border-bottom:none; }
+.lesson-cb { width:24px; height:24px; border-radius:8px; border:2px solid #e0d0c8; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:14px; color:transparent; transition:all .15s; }
+.lesson-cb.checked { background:var(--green); border-color:var(--green); color:#fff; }
+.lesson-name { font-size:13px; flex:1; line-height:1.4; }
+.lesson-name.checked { color:var(--text2); text-decoration:line-through; }
+.lesson-dur { font-size:11px; color:var(--text2); flex-shrink:0; background:var(--card2); padding:2px 8px; border-radius:8px; }
+.lesson-special { font-size:13px; flex:1; font-weight:600; }
+
+/* Calendar */
+.calendar-section { padding:12px 20px; }
+.cal-nav { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.cal-nav button { background:var(--card); border:2px solid var(--border); color:var(--text); width:34px; height:34px; border-radius:10px; font-size:16px; cursor:pointer; font-weight:700; }
+.cal-month { font-size:15px; font-weight:700; }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+.cal-hdr { text-align:center; font-size:11px; color:var(--text2); padding:4px 0; font-weight:600; }
+.cal-day { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:12px; border-radius:10px; color:var(--text2); font-weight:600; }
+.cal-day.has-data { color:var(--text); }
+.cal-day.today { border:2px solid var(--accent); color:var(--accent); }
+.cal-day.lv1 { background:#fff3e0; }
+.cal-day.lv2 { background:#ffe0b2; }
+.cal-day.lv3 { background:#ffcc80; }
+.cal-day.lv4 { background:#ffab40; color:#fff; }
+.cal-legend { display:flex; justify-content:center; gap:6px; align-items:center; margin-top:10px; font-size:11px; color:var(--text2); }
+.cal-legend-box { width:14px; height:14px; border-radius:4px; }
+
+.history-section { padding:12px 20px; }
+.history-item { background:var(--card); border-radius:14px; padding:12px 16px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; box-shadow:var(--shadow); }
+.history-date { font-size:13px; font-weight:700; }
+.history-detail { font-size:12px; color:var(--text2); margin-top:2px; }
+.history-hours { font-size:18px; font-weight:800; color:var(--accent); }
+.history-unit { font-size:11px; color:var(--text2); }
+.history-del { color:var(--accent2); font-size:18px; cursor:pointer; padding:4px 8px; border:none; background:none; opacity:.5; }
+
+/* Bottom Nav */
+.bottom-nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; background:var(--card); border-top:1px solid var(--border); display:flex; padding:6px 0; padding-bottom:max(6px,env(safe-area-inset-bottom)); z-index:100; box-shadow:0 -2px 10px rgba(0,0,0,0.04); }
+.nav-item { flex:1; text-align:center; padding:6px 0; cursor:pointer; border:none; background:none; color:var(--text2); font-size:11px; font-weight:600; font-family:inherit; }
+.nav-item.active { color:var(--accent); }
+.nav-icon { font-size:22px; display:block; margin-bottom:1px; }
+
+.page { display:none; }
+.page.active { display:block; }
+
+/* Modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.3); z-index:200; align-items:center; justify-content:center; }
+.modal-overlay.show { display:flex; }
+.modal { background:var(--card); border-radius:24px; padding:24px; width:320px; max-width:90vw; box-shadow:0 10px 40px rgba(0,0,0,0.12); }
+.modal h3 { font-size:17px; font-weight:800; margin-bottom:16px; text-align:center; color:var(--accent); }
+.modal label { display:block; font-size:13px; color:var(--text2); margin:12px 0 6px; font-weight:600; }
+.modal input, .modal select { width:100%; background:var(--card2); border:2px solid var(--border); border-radius:12px; padding:10px 14px; color:var(--text); font-size:14px; outline:none; font-family:inherit; }
+.modal-btns { display:flex; gap:10px; margin-top:20px; }
+.modal-btns button { flex:1; padding:12px; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; }
+.btn-cancel { background:#f5f5f5; color:var(--text2); }
+.btn-confirm { background:linear-gradient(135deg,#ff8a65,#ff6b6b); color:#fff; }
+
+/* Flashcard Page */
+.fc-page { position:fixed; inset:0; background:var(--bg); z-index:150; display:none; flex-direction:column; max-width:480px; margin:0 auto; }
+.fc-page.show { display:flex; }
+.fc-header { padding:14px 20px; display:flex; align-items:center; gap:12px; flex-shrink:0; }
+.fc-close { background:var(--card); border:2px solid var(--border); color:var(--text); width:36px; height:36px; border-radius:12px; font-size:18px; cursor:pointer; font-weight:700; }
+.fc-title { font-size:15px; font-weight:800; color:var(--accent); flex:1; }
+.fc-counter { font-size:12px; color:var(--text2); font-weight:700; background:var(--card); padding:4px 10px; border-radius:10px; }
+.fc-progress-bar { margin:0 20px 10px; height:6px; background:#fce4d6; border-radius:3px; overflow:hidden; flex-shrink:0; }
+.fc-progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--green)); border-radius:3px; transition:width .3s; }
+.fc-body { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px 20px; overflow:hidden; position:relative; }
+.fc-img-wrap { position:relative; width:100%; max-height:60vh; border-radius:16px; overflow:hidden; box-shadow:var(--shadow); background:#fff; }
+.fc-img-wrap img { width:100%; display:block; }
+.fc-mask { position:absolute; top:0; right:0; width:50%; height:100%; background:linear-gradient(90deg,rgba(255,248,240,0.3),rgba(255,248,240,0.97) 15%); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); transition:opacity .4s; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.fc-mask.revealed { opacity:0; pointer-events:none; }
+.fc-mask-hint { background:var(--accent); color:#fff; padding:10px 20px; border-radius:14px; font-size:14px; font-weight:700; box-shadow:0 4px 15px rgba(255,138,101,0.3); }
+.fc-actions { display:flex; gap:12px; margin-top:16px; flex-shrink:0; padding-bottom:20px; }
+.fc-actions button { padding:14px 32px; border:none; border-radius:16px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; transition:transform .1s; }
+.fc-actions button:active { transform:scale(.95); }
+.fc-btn-again { background:#fff3e0; color:var(--accent); border:2px solid var(--accent); }
+.fc-btn-got { background:linear-gradient(135deg,#66bb6a,#4caf50); color:#fff; box-shadow:0 4px 15px rgba(102,187,106,0.3); }
+.fc-btn-next { background:linear-gradient(135deg,#ff8a65,#ff6b6b); color:#fff; }
+.fc-stats { display:flex; gap:16px; margin-top:10px; font-size:12px; color:var(--text2); font-weight:600; flex-shrink:0; }
+.fc-stats .mastered { color:var(--green); }
+.fc-stats .review { color:var(--accent); }
+/* Flashcard entry button in detail */
+.fc-entry-btn { display:flex; align-items:center; gap:8px; margin:8px 20px 12px; padding:12px 16px; background:linear-gradient(135deg,#fff5ee,#fce4ec); border:2px solid #f0d0c0; border-radius:14px; cursor:pointer; font-size:14px; font-weight:700; color:var(--accent); }
+.fc-entry-btn:active { transform:scale(.98); }
+.fc-entry-btn .fc-entry-count { margin-left:auto; font-size:12px; color:var(--text2); font-weight:600; }
+/* Summary screen */
+.fc-summary { text-align:center; padding:40px 20px; }
+.fc-summary .emoji { font-size:64px; }
+.fc-summary h2 { font-size:20px; font-weight:800; color:var(--accent); margin:16px 0 8px; }
+.fc-summary p { font-size:14px; color:var(--text2); line-height:1.6; }
+.fc-summary .stats-row { display:flex; gap:20px; justify-content:center; margin:20px 0; }
+.fc-summary .stat-item { text-align:center; }
+.fc-summary .stat-num { font-size:28px; font-weight:800; }
+.fc-summary .stat-label { font-size:11px; color:var(--text2); }
+.fc-summary button { margin-top:16px; padding:14px 40px; border:none; border-radius:16px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; background:linear-gradient(135deg,#ff8a65,#ff6b6b); color:#fff; }
+.fc-mode-btns { display:flex; gap:10px; margin-bottom:12px; flex-shrink:0; }
+.fc-mode-btns button { flex:1; padding:8px; border:none; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; background:var(--card); color:var(--text2); border:2px solid var(--border); }
+.fc-mode-btns button.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+/* Celebration */
+.celebrate { position:fixed; top:0; left:50%; transform:translateX(-50%); max-width:480px; width:100%; text-align:center; padding:20px; font-size:16px; font-weight:800; color:#fff; background:linear-gradient(135deg,#66bb6a,#4caf50); z-index:300; animation:slideDown .5s ease; }
+@keyframes slideDown { from{transform:translateX(-50%) translateY(-100%)} to{transform:translateX(-50%) translateY(0)} }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.subj-card,.module-card { animation:fadeIn .3s ease; }
+</style>
+</head>
+<body>
+<svg width="0" height="0"><defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff8a65"/><stop offset="100%" stop-color="#66bb6a"/></linearGradient></defs></svg>
+<div id="celebrate" class="celebrate" style="display:none"></div>
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <div class="header">
+    <h1 id="greeting-title"></h1>
+    <div class="greeting" id="greeting-sub"></div>
+    <div class="exam-cd">距考试 <span class="big" id="cd-days">0</span> 天</div>
+  </div>
+  <div class="stats">
+    <div class="stat-card sc-streak"><div class="icon">&#x1F525;</div><div class="num" id="s-streak">0</div><div class="label">连续打卡</div></div>
+    <div class="stat-card sc-hours"><div class="icon">&#x23F0;</div><div class="num" id="s-hours">0</div><div class="label">累计小时</div></div>
+    <div class="stat-card sc-prog"><div class="icon">&#x1F4D6;</div><div class="num" id="s-lessons">0/0</div><div class="label">课程完成</div></div>
+  </div>
+  <div class="daily-goal">
+    <div class="dg-top"><span class="lbl">今日学习目标</span><span class="val"><span id="today-h">0</span> / 2.6 h</span></div>
+    <div class="dg-bar"><div class="dg-fill" id="today-bar" style="width:0%"></div></div>
+    <div class="dg-msg" id="dg-msg"></div>
+  </div>
+  <div class="timer-section">
+    <select id="timer-sel"></select>
+    <div class="timer-display" id="timer-disp">00:00:00</div>
+    <div class="timer-btns">
+      <button class="btn-start" id="btn-timer" onclick="toggleTimer()">&#x25B6; 开始学习</button>
+      <button class="btn-manual" onclick="openManual()">&#x270F; 手动记录</button>
+    </div>
+  </div>
+  <div class="quote-section"><div class="quote-text" id="q-text"></div><div class="quote-author" id="q-auth"></div></div>
+  <div class="ring-section">
+    <div class="ring-box">
+      <svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="42"/><circle class="ring-fg" id="ring-fg" cx="50" cy="50" r="42" stroke-dasharray="263.9" stroke-dashoffset="263.9"/></svg>
+      <div class="ring-center"><div class="pct" id="ring-pct">0%</div><div class="sub">总进度</div></div>
+    </div>
+    <div class="ring-info">
+      <div>&#x1F4DA; 基础课 <span class="done" id="ri-b">0</span>/<span id="ri-bt">0</span></div>
+      <div>&#x270F;&#xFE0F; 课后题 <span class="done" id="ri-e">0</span>/<span id="ri-et">0</span></div>
+      <div>&#x1F525; 强化课 <span class="done" id="ri-i">0</span>/<span id="ri-it">0</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SUBJECTS -->
+<div id="page-subjects" class="page">
+  <div class="header" style="padding-bottom:12px"><h1 style="color:var(--accent)">&#x1F4DA; 科目进度</h1></div>
+  <div class="subject-list" id="subj-list"></div>
+</div>
+
+<!-- DETAIL -->
+<div id="page-detail" class="page">
+  <div class="detail-header">
+    <button class="detail-back" onclick="backToList()">&larr;</button>
+    <div class="detail-title" id="det-title"></div>
+  </div>
+  <div class="detail-progress" id="det-progress"></div>
+  <div id="det-content"></div>
+</div>
+
+<!-- CALENDAR -->
+<div id="page-calendar" class="page">
+  <div class="header" style="padding-bottom:12px"><h1 style="color:var(--accent)">&#x1F4C5; 学习日历</h1></div>
+  <div class="calendar-section">
+    <div class="cal-nav"><button onclick="calNav(-1)">&lt;</button><div class="cal-month" id="cal-month"></div><button onclick="calNav(1)">&gt;</button></div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-legend"><span>少</span><div class="cal-legend-box lv1"></div><div class="cal-legend-box lv2"></div><div class="cal-legend-box lv3"></div><div class="cal-legend-box lv4"></div><span>多</span></div>
+  </div>
+  <div class="history-section" id="hist-list"></div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-manual">
+  <div class="modal">
+    <h3>&#x270F; 手动记录学习</h3>
+    <label>科目</label><select id="m-subj"></select>
+    <label>学习时长 (小时)</label><input type="number" id="m-hours" step="0.1" min="0" max="24" placeholder="例如 1.5">
+    <label>日期</label><input type="date" id="m-date">
+    <div class="modal-btns"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-confirm" onclick="saveManual()">保存</button></div>
+  </div>
+</div>
+
+<!-- Flashcard fullscreen page -->
+<div class="fc-page" id="fc-page">
+  <div class="fc-header">
+    <button class="fc-close" onclick="closeFC()">&larr;</button>
+    <div class="fc-title" id="fc-title"></div>
+    <div class="fc-counter" id="fc-counter"></div>
+  </div>
+  <div class="fc-progress-bar"><div class="fc-progress-fill" id="fc-bar"></div></div>
+  <div class="fc-mode-btns" style="padding:0 20px">
+    <button id="fc-mode-all" class="active" onclick="setFCMode('all')">全部复习</button>
+    <button id="fc-mode-review" onclick="setFCMode('review')">只看待复习</button>
+    <button id="fc-mode-shuffle" onclick="setFCMode('shuffle')">随机打乱</button>
+  </div>
+  <div class="fc-body" id="fc-body">
+    <div class="fc-img-wrap" id="fc-img-wrap">
+      <img id="fc-img" src="" alt="flashcard">
+      <div class="fc-mask" id="fc-mask" onclick="revealFC()">
+        <div class="fc-mask-hint">点击查看答案</div>
+      </div>
+    </div>
+  </div>
+  <div class="fc-stats" style="justify-content:center">
+    <span class="mastered" id="fc-mastered">0 已掌握</span>
+    <span class="review" id="fc-review">0 待复习</span>
+  </div>
+  <div class="fc-actions" id="fc-actions" style="justify-content:center">
+    <button class="fc-btn-again" onclick="fcRate('again')">&#x1F50D; 再看看</button>
+    <button class="fc-btn-got" onclick="fcRate('got')">&#x2705; 记住了</button>
+  </div>
+</div>
+
+<!-- Nav -->
+<div class="bottom-nav">
+  <button class="nav-item active" onclick="showPage('home',this)"><span class="nav-icon">&#x1F3E0;</span>首页</button>
+  <button class="nav-item" onclick="showPage('subjects',this)"><span class="nav-icon">&#x1F4DA;</span>科目</button>
+  <button class="nav-item" onclick="showPage('calendar',this)"><span class="nav-icon">&#x1F4C5;</span>日历</button>
+</div>
+
+<script>
+// ============================================================
+// COURSE DATA
+// ============================================================
+const S = [
+  {
+    id:'cme', name:'CME (宏观经济)', weight:'15-20%',
+    modules:[
+      { name:'M1 Framework & Macro Considerations', lessons:[
+        {n:'Introduction to CME',d:40},{n:'A Framework for Developing CME',d:37},{n:'Limitations of Economic Data',d:31},
+        {n:'Limitations of Historical Estimates',d:45},{n:'Ex Post Risk as Biased Measure',d:23},{n:'Biases in Analysts Methods',d:32},
+        {n:'Misinterpretation of Correlations',d:49},{n:'Model Uncertainty',d:12},{n:'Exogenous Shocks to Growth',d:26},
+        {n:'Decomposition of GDP Growth',d:40},{n:'Anchoring Asset Returns to Trend Growth',d:35},
+        {n:'Econometric Modeling & Indicators',d:44},{n:'Forecasting Approaches',d:30},
+        {n:'Phases of Business Cycle (1)',d:45},{n:'Phases of Business Cycle (2)',d:52},
+        {n:'Inflation & Deflation Trends',d:34},{n:'Effect of Inflation on Asset Classes',d:46},
+        {n:'Introduction to Monetary & Fiscal Policy',d:25},{n:'Monetary Policy - Taylor Rule',d:19},
+        {n:'QE & Zero/Negative Interest Rates',d:40},{n:'Monetary & Fiscal Policy Mix',d:46},
+        {n:'Yield Curve & Business Cycle',d:14},{n:'Macroeconomic Linkages',d:37},
+        {n:'International Interactions & Summary',d:57}
+      ], ex:16 },
+      { name:'M2 Forecasting Asset Class Returns', lessons:[
+        {n:'Framework',d:8},{n:'Overviews of Tools & Approaches',d:55},{n:'Forecasting FI Returns',d:22},
+        {n:'Applying DCF to Fixed Income',d:32},{n:'Example: Return Based on YTM',d:20},
+        {n:'Building Block Approach & Short-term Rate',d:27},{n:'The Term Premium',d:32},
+        {n:'The Credit Premium',d:35},{n:'The Liquidity Premium',d:29},{n:'Risks in EM Bonds',d:32},
+        {n:'Summary of FI Returns',d:14},{n:'Historical Statistics & DCF (1)',d:42},{n:'DCF Approach (2)',d:33},
+        {n:'Risk Premium: Building Block',d:8},{n:'Singer-Terhaar Model',d:38},{n:'Risks in EM Equities',d:19},
+        {n:'Historical RE Returns',d:18},{n:'Real Estate Cycles',d:11},{n:'Capitalization Rates',d:48},
+        {n:'Risk Premium on RE Returns',d:18},{n:'Public vs Private RE',d:17},{n:'Long-Term Housing Returns',d:16},
+        {n:'Forecasting Exchange Rates',d:18},{n:'Purchasing Power Parity',d:26},
+        {n:'Current Account Sustainability',d:37},{n:'Capital Mobility',d:45},
+        {n:'Uncovered Interest Rate Parity',d:27},{n:'Portfolio Balance & Sustainability',d:32},
+        {n:'FX Example & Summary',d:30},{n:'Estimating Constant VCV Matrix',d:13},
+        {n:'VCV from Multi-Factor Models',d:48},{n:'Shrinkage Estimation',d:14},
+        {n:'Volatility from Smoothed Returns',d:12},{n:'ARCH Models',d:44},{n:'Volatility Summary',d:23},
+        {n:'Adjusting A Global Portfolio',d:36},{n:'Summary',d:27}
+      ], ex:30 }
+    ]
+  },
+  {
+    id:'aa', name:'资产配置 (AA)', weight:'15-20%',
+    modules:[
+      { name:'M3 Overview of Asset Allocation', lessons:[
+        {n:'Introduction',d:48},{n:'Framework',d:11},{n:'Investment Governance',d:26},
+        {n:'Governance Structures',d:2},{n:'6 Elements in Effective Governance',d:29},
+        {n:'Examples: Governance',d:12},{n:'Economic Balance Sheet',d:20},
+        {n:'Strategic Asset Allocation',d:18},{n:'Asset-Only Approaches',d:44},
+        {n:'Global Market Portfolio',d:34},{n:'Liability-relative Approaches',d:21},
+        {n:'Goals-based Approaches',d:29},{n:'Liabilities vs Goals',d:7},
+        {n:'Objectives & Risk Concepts',d:14},{n:'Asset Class Definition',d:25},
+        {n:'Factor-Based Approach',d:29},{n:'Passive/Active',d:29},
+        {n:'Risk Budgeting',d:15},{n:'Rebalancing',d:34}
+      ], ex:9 },
+      { name:'M4 Principles of Asset Allocation', lessons:[
+        {n:'Framework',d:6},{n:'MVO: Efficient Frontier',d:40},{n:'MVO & Example',d:19},
+        {n:'MVO: Constraints',d:41},{n:'MVO: Criticisms',d:12},{n:'Monte Carlo Simulation',d:40},
+        {n:'Reverse Optimization',d:27},{n:'Black-Litterman Method',d:8},
+        {n:'Constraints Beyond Budget',d:7},{n:'Resampled MVO',d:22},
+        {n:'Non-Normal Approaches',d:23},{n:'Less Liquid Assets',d:10},
+        {n:'Risk Budgeting (1)',d:31},{n:'Risk Budgeting (2)',d:12},{n:'Factor-Based AA',d:16},
+        {n:'Summary',d:20},{n:'Characterizing Liabilities',d:21},
+        {n:'Liability-relative AA Approaches',d:14},{n:'Hedging/Return-Seeking',d:25},
+        {n:'Integrated Asset-Liability',d:18},{n:'Comparing Approaches',d:18},
+        {n:'Robustness & Factor Model',d:13},{n:'Goals-Based AA',d:25},
+        {n:'Goals & Sub-Portfolios',d:24},{n:'Overall Portfolio & Review',d:24},
+        {n:'Other AA Approaches',d:28},{n:'Portfolio Rebalancing',d:34}
+      ], ex:19 },
+      { name:'M5 Real-world Constraints', lessons:[
+        {n:'Framework',d:5},{n:'Asset Size Constraints',d:37},{n:'Liquidity & Time Horizon',d:28},
+        {n:'Regulatory Constraints',d:13},{n:'Taxable Investor',d:37},
+        {n:'Revising Strategic AA',d:18},{n:'Short-term Shifts',d:37},
+        {n:'Loss Aversion & Illusion of Control',d:13},{n:'Mental Accounting & Recency',d:13},
+        {n:'Availability Bias & Summary',d:13}
+      ], ex:24 }
+    ]
+  },
+  {
+    id:'ips_p', name:'个人IPS', weight:'15-20%',
+    modules:[
+      { name:'M4 Private Wealth Management', lessons:[
+        {n:'Introduction',d:9},{n:'Reasons of wealth creation after WWII',d:27},
+        {n:'Regional Patterns of Global Wealth',d:15},{n:'Distribution of Global Wealth',d:5},
+        {n:'The Gini coefficient',d:19},{n:'Wealth Segments & Family offices',d:11},
+        {n:'The Mobility of HNWIS',d:6},{n:'Wealth',d:25},{n:'Net worth',d:12},
+        {n:'Economic Balance Sheet',d:23},{n:'Financial stages of life',d:18},
+        {n:'Important conclusion',d:21},{n:'Objectives',d:21},{n:'Risks',d:37},
+        {n:'Taxes on Investment Income',d:41},{n:'Impact of Accrual Taxes',d:21},
+        {n:'Impact of Deferral Taxes',d:23},{n:'Impact of Basis on Capital Gains',d:11},
+        {n:'Influence of inflation on returns',d:31},{n:'Institutional vs Individual',d:27},
+        {n:'Introduction of IPS',d:15},{n:'Background & Investment Objectives',d:10},
+        {n:'Investment Parameters',d:16},{n:'Portfolio Management',d:19},
+        {n:'Duties & Responsibilities',d:5},{n:'Sample IPS',d:21},{n:'Review',d:13}
+      ], ex:42 }
+    ]
+  },
+  {
+    id:'ips_i', name:'机构IPS', weight:'15-20%',
+    modules:[
+      { name:'M5 Institutional Investors', lessons:[
+        {n:'Introduction to Institutional Investors',d:11},{n:'Overview of Institutional Investors',d:51},
+        {n:'Changes in Institutional Investors',d:13},{n:'Common: Scale (Asset Size)',d:26},
+        {n:'Common: Long-Term Horizon & Regulatory',d:11},{n:'Common: Governance & Principal-Agent',d:21},
+        {n:'Norway Model',d:23},{n:'Endowment Model',d:8},{n:'Canada Model',d:15},
+        {n:'LDI Model and Examples',d:32},{n:'Pension: DB and DC',d:39},
+        {n:'Pension: Stakeholders',d:35},{n:'Pension: Liabilities & Horizon(DB) 01',d:41},
+        {n:'Pension: Liabilities & Horizon(DB) 02',d:20},{n:'Pension: Liabilities & Horizon(DC)',d:18},
+        {n:'Pension: Liquidity Needs',d:32},{n:'External Constraints',d:38},
+        {n:'Risk of Private DB Pension',d:49},{n:'Investment Objectives: DB & DC',d:21},
+        {n:'AA By Pension Plans & Summary',d:37},{n:'SWFs: Major Types',d:26},
+        {n:'SWFs: Stakeholders & Horizons',d:37},{n:'SWFs: Liquidity Needs',d:12},
+        {n:'SWFs: Constraints & Objectives',d:22},{n:'SWFs: AA & Summary',d:27},
+        {n:'Endowments & Foundations Basics',d:23},{n:'Uni Endowments: Stakeholders',d:8},
+        {n:'Uni Endowments: Liabilities & Horizon',d:41},{n:'Uni Endowments: Liquidity',d:6},
+        {n:'Private Foundations: Stakeholders',d:13},{n:'Private Foundations: Liabilities',d:28},
+        {n:'Private Foundations: Liquidity',d:13},{n:'E&F: External Constraints',d:12},
+        {n:'Endowment: Investment Objectives',d:36},{n:'Foundations: Investment Objectives',d:6},
+        {n:'E&F: Asset Allocation',d:30},{n:'Summary of E&F',d:12},
+        {n:'Intro to Banks and Insurers',d:55},{n:'Banks: Stakeholders',d:5},
+        {n:'Banks: Liabilities & Horizon',d:13},{n:'Banks: Liquidity Needs',d:10},
+        {n:'Insurers: Stakeholders',d:19},{n:'Insurers: Liabilities & Horizon',d:10},
+        {n:'Insurers: Liquidity Needs',d:11},{n:'Banks/Insurers: External Constraints',d:22},
+        {n:'Investment Objectives & Summary',d:30},{n:'Duration of SE (1)',d:58},
+        {n:'Duration of SE (2)',d:14},{n:'Volatility of SE Value',d:56},
+        {n:'Implementation & Summary',d:55}
+      ], ex:18 },
+      { name:'M7 Case Study: Institutional (SWF)', lessons:[
+        {n:'Dimensions of Financial Risk Mgmt',d:38},{n:'Risk for Long-Term Investors',d:18},
+        {n:'Risks of Illiquid Asset Classes',d:33},{n:'Managing Liquidity Risk',d:6},
+        {n:'Enterprise Risk Management',d:11},{n:'Environmental & Social Risks',d:39},
+        {n:'R-SWF Investments: 1.0',d:56},{n:'R-SWF Investments: 2.0&3.0',d:36}
+      ], ex:0 }
+    ]
+  },
+  {
+    id:'pw_ips_i', name:'Pathway-机构IPS', weight:'15-20%',
+    modules:[
+      { name:'M8 Case Study: Institutional', lessons:[
+        {n:'Liquidity Profiling & Time-to-Cash',d:41},{n:'Rebalancing & Commitment Strategies',d:23},
+        {n:'Stress Testing & Derivatives',d:15},{n:'Earning Illiquidity Premium',d:12},
+        {n:'Spending Policy & Investment Objective',d:25},{n:'1. Quadrivium University',d:24},
+        {n:'2. Investment Strategy: Background',d:20},{n:'3. Strategic Asset Allocation',d:55},
+        {n:'COVID-19 Example',d:21},{n:'4. Liquidity Management',d:43},
+        {n:'5. Asset Manager Selection',d:50},{n:'6. Tactical AA (1)-(2)',d:48},
+        {n:'6. Tactical AA (3)',d:36},{n:'7. AA Rebalancing',d:35},{n:'8. ESG Integration',d:29}
+      ], ex:0 }
+    ]
+  },
+  {
+    id:'equity', name:'权益', weight:'15-20%',
+    modules:[
+      { name:'M1 Overview of Equity Portfolio', lessons:[
+        {n:'Introduction',d:7},{n:'Capital appreciation & Dividend income',d:17},
+        {n:'Diversification & Inflation hedge',d:26},{n:'Segmentation by Size and Style',d:26},
+        {n:'Segmentation by Geography & Indexes',d:11},{n:'Income In An Equity Portfolio',d:17},
+        {n:'Costs In An Equity Portfolio',d:19},{n:'Shareholder Engagement',d:13},
+        {n:'Active Management Spectrum',d:12},{n:'Indexes as a Basis for Investment',d:13},
+        {n:'Non-investable Stocks',d:22},{n:'Choosing a Benchmark',d:18},
+        {n:'Index Construction Methodologies',d:25},{n:'Herfindahl-Hirschman Index',d:20}
+      ], ex:11 }
+    ]
+  },
+  {
+    id:'pw_equity', name:'Pathway-权益', weight:'15-20%',
+    modules:[
+      { name:'M1 Index-Based Equity Strategies', lessons:[
+        {n:'Factor-based Strategies (1)',d:28},{n:'Factor-based Strategies (2)',d:30},
+        {n:'Pooled Investments',d:23},{n:'Derivatives-Based Approaches',d:15},
+        {n:'Portfolio Construction',d:24},{n:'Tracking Error Management',d:9},
+        {n:'Sources Of Return And Risk',d:22}
+      ], ex:16 },
+      { name:'M2 Active Equity Investing', lessons:[
+        {n:'Approaches To Active Management',d:24},{n:'Distinguishing Characteristics',d:35},
+        {n:'Bottom-Up Strategies(1)',d:42},{n:'Bottom-Up Strategies(2)',d:19},
+        {n:'Top-Down Strategies',d:16},{n:'Factor-Based Strategies',d:55},
+        {n:'Activist & Other Strategies',d:41},{n:'Fundamental Active Strategy',d:23},
+        {n:'Quantitative Active Strategy',d:29},{n:'Style Classification',d:38}
+      ], ex:16 },
+      { name:'M3 Active Portfolio Construction', lessons:[
+        {n:'Fundamentals of Construction',d:43},{n:'Building Blocks',d:30},
+        {n:'Approaches To Construction',d:34},{n:'Active Share and Active Risk',d:58},
+        {n:'Example: Active Share & Risk',d:20},{n:'Objectives and Constraints',d:28},
+        {n:'Implicit Cost Considerations',d:36},{n:'Well-constructed Portfolio(1)',d:24},
+        {n:'Well-constructed Portfolio(2)',d:27},{n:'Long/Short & Market-neutral(1)',d:37},
+        {n:'Long/Short & Market-neutral(2)',d:51},{n:'Allocating Risk Budget',d:40},
+        {n:'Appropriate Level of Risk',d:31},{n:'Additional Risk Measures',d:27}
+      ], ex:16 }
+    ]
+  },
+  {
+    id:'fi', name:'固收', weight:'15-20%',
+    modules:[
+      { name:'M0 FI Framework', lessons:[
+        {n:'Framework for FI Portfolio Mgmt',d:43},{n:'Interest rate risk (parallel)',d:42},
+        {n:'Yield curve risk (non-parallel)',d:28},{n:'Spread risk',d:23},
+        {n:'Credit risk and Option risk',d:19}
+      ], ex:0 },
+      { name:'M1 Overview of FI Portfolio Mgmt', lessons:[
+        {n:'Roles of FI Securities in Portfolios',d:41},{n:'Liability-Based Mandates',d:43},
+        {n:'Total Return Mandates',d:44},{n:'With ESG Consideration',d:8},
+        {n:'Liquidity among Bond Sub-Sectors',d:15},{n:'Effects of Liquidity on FI Mgmt',d:9},
+        {n:'Alternatives to Direct Investment',d:41},{n:'FI Returns Model (1)',d:39},
+        {n:'FI Returns Model (2)',d:44},{n:'Using Leverage',d:12},
+        {n:'Leveraging Methods & Risks',d:43},{n:'FI Portfolio Taxation',d:15},
+        {n:'Liability-Driven Investing',d:15},{n:'Classification of Liabilities',d:30},
+        {n:'Cash Flow Matching',d:24},{n:'Laddered Portfolio',d:30}
+      ], ex:16 }
+    ]
+  },
+  {
+    id:'pw_fi', name:'Pathway-固收', weight:'15-20%',
+    modules:[
+      { name:'M1 LDI & Index-Based Strategies', lessons:[
+        {n:'Framework of Pathway-FI',d:19},{n:'Single Liability Immunization',d:45},
+        {n:'Immunizing: Cash flow yield & Macaulay',d:45},{n:'Immunizing: Dispersion & convexity',d:19},
+        {n:'Structural risk & Summary',d:58},{n:'Duration Matching',d:30},
+        {n:'Derivatives Overlay',d:39},{n:'Contingent Immunization',d:19},
+        {n:'Different Measures for Liabilities',d:26},{n:'Duration Gap: Futures & IR Swap',d:22},
+        {n:'Duration Gap: Swaption & Collar',d:34},{n:'Summary of DB Pension Plan',d:18},
+        {n:'Model risks and Spread risk',d:16},{n:'Counterparty & collateral risk',d:40},
+        {n:'Summary of LDI',d:14},{n:'Bond Indexes & Challenges',d:23},
+        {n:'Index-based Investments (1)',d:37},{n:'Index-based Investments (2)',d:16},
+        {n:'Index-based Investments (3)',d:13},{n:'Alternative Passive Methods',d:28},
+        {n:'Benchmark Selection',d:19}
+      ], ex:27 },
+      { name:'M2 Yield Curve Strategies', lessons:[
+        {n:'Framework of YC Strategies',d:18},{n:'Key Yield Curve',d:37},
+        {n:'Duration and Convexity',d:31},{n:'Cash-Based Static Yield',d:57},
+        {n:'Derivatives-Based Static Yield',d:30},{n:'Summary of Static YC',d:17},
+        {n:'Divergent Rate Level View',d:40},{n:'Divergent Slope (Steepening)',d:36},
+        {n:'Divergent Slope (Flattening)',d:32},{n:'Divergent Curve Shape',d:19},
+        {n:'Cash-Based YC Volatility',d:30},{n:'Derivatives-Based YC Volatility',d:53},
+        {n:'Key Rate Duration',d:23},{n:'Summary of YC Strategies',d:20},
+        {n:'Covered & Uncovered IRP',d:44},{n:'Carry Trade across Currencies',d:49},
+        {n:'Evaluating YC Strategies',d:19}
+      ], ex:27 },
+      { name:'M3 Credit Strategies', lessons:[
+        {n:'Framework of Credit Strategies',d:25},{n:'Default Probabilities & Recovery',d:22},
+        {n:'Default vs Migration & Spread Curves',d:28},{n:'Empirical Duration',d:19},
+        {n:'Fixed-rate bond (1)',d:33},{n:'Fixed-rate bond (2)',d:20},
+        {n:'Fixed-rate bond (3)',d:55},{n:'Summary: FRB Credit measures',d:13},
+        {n:'Floating-rate bond',d:36},{n:'Yield spreads: Rolling yield',d:35},
+        {n:'Yield spreads: Spread changes',d:17},{n:'Annualized excess spread return',d:30},
+        {n:'Bottom-Up Credit strategies',d:49},{n:'Top-Down Credit strategies',d:33},
+        {n:'Factor-Based Credit strategies',d:22},{n:'Liquidity Risk',d:22},
+        {n:'Tail Risk',d:48},{n:'Basic concepts of CDS',d:29},
+        {n:'CDS Price',d:50},{n:'CDS Strategies',d:55},
+        {n:'Static Credit Spread (1)',d:63},{n:'Static Credit Spread (2)',d:24},
+        {n:'Dynamic Credit Spread (1)',d:40},{n:'Dynamic Credit Spread (2)',d:51},
+        {n:'Global credit strategies',d:54},{n:'Structured credit',d:30},
+        {n:'FI analytics and summary',d:38}
+      ], ex:26 }
+    ]
+  },
+  {
+    id:'alts', name:'另类', weight:'15-20%',
+    modules:[
+      { name:'M3 Alternative Investments', lessons:[
+        {n:'Role Of Different Alt Investments',d:37},{n:'Diversifying Equity Risk',d:17},
+        {n:'Perspectives On Opportunity Set',d:29},{n:'Investment considerations',d:60},
+        {n:'Examples',d:16},{n:'Suitability Considerations',d:25},
+        {n:'Primary Approaches Of Allocation',d:34},{n:'Portfolio Optimization',d:24},
+        {n:'Liquidity planning',d:22},{n:'Monitoring the Program',d:38},
+        {n:'Summary',d:8}
+      ], ex:20 }
+    ]
+  },
+  {
+    id:'trading', name:'交易', weight:'15-20%',
+    modules:[
+      { name:'M1 Trading Costs & Electronic Markets', lessons:[
+        {n:'Introduction',d:9},{n:'Components of Trading Costs',d:16},
+        {n:'Bid-Ask Spread',d:25},{n:'Effective Spreads',d:32},
+        {n:'VWAP',d:21},{n:'Implementation Shortfall',d:21},
+        {n:'Market Developments',d:42},{n:'Types of Electronic Traders',d:45},
+        {n:'Speed is Valuable',d:25},{n:'Advanced Orders & Algorithms',d:26},
+        {n:'Electronic Trading Changed Strategies',d:34},{n:'Systemic Risks',d:38},
+        {n:'Real-Time Surveillance',d:38},{n:'Summary',d:14}
+      ], ex:16 }
+    ]
+  },
+  {
+    id:'pw_trading', name:'Pathway-交易', weight:'15-20%',
+    modules:[
+      { name:'M7 Trade Strategy & Execution', lessons:[
+        {n:'Introduction of Trading',d:25},{n:'Motivations to Trade (1)',d:28},
+        {n:'Motivations to Trade (2)',d:28},{n:'Trade Strategy Inputs',d:49},
+        {n:'Reference Prices (1)',d:27},{n:'Reference Prices (2)',d:24},
+        {n:'Trade Implementation Choices',d:26},{n:'Algorithmic Trading (1)',d:34},
+        {n:'Algorithmic Trading (2)',d:24},{n:'Comparison of Markets',d:32},
+        {n:'Implementation Shortfall',d:43},{n:'Expanded Implementation Shortfall',d:33},
+        {n:'Evaluating Trade Execution',d:41},{n:'Trade Governance & Summary',d:21}
+      ], ex:35 }
+    ]
+  },
+  {
+    id:'perf', name:'绩效评估', weight:'5-10%',
+    modules:[
+      { name:'M1 Portfolio Performance Evaluation', lessons:[
+        {n:'Components of Performance Evaluation',d:34},{n:'Performance Attribution',d:42},
+        {n:'Framework of Return Attribution',d:12},{n:'The Brinson Model',d:47},
+        {n:'Factor-Based Return Attribution',d:50},{n:'Fixed-Income Return Attribution',d:66},
+        {n:'Macro Attribution',d:25},{n:'Risk Attribution',d:26},
+        {n:'Benchmark Types',d:44},{n:'Benchmark Properties',d:43},
+        {n:'Test of Benchmark Quality',d:15},{n:'Benchmarking Alternatives',d:34},
+        {n:'Sharpe/Treynor/Information Ratios',d:26},{n:'Sortino Ratio',d:14},
+        {n:'Capture Ratios',d:18},{n:'Drawdown & Summary',d:38}
+      ], ex:17 },
+      { name:'M2 Investment Manager Selection', lessons:[
+        {n:'Framework of Manager Selection',d:15},{n:'Type I & II Error',d:40},
+        {n:'Style Analysis & Capture Ratios',d:29},{n:'Investment Due Diligence',d:25},
+        {n:'Operational Due Diligence',d:28},{n:'Management Fees (1)',d:35},
+        {n:'Management Fees (2)',d:24}
+      ], ex:43 }
+    ]
+  },
+  {
+    id:'gips', name:'GIPS', weight:'5-10%',
+    modules:[
+      { name:'M3 Overview of GIPS', lessons:[
+        {n:'Learning Tips & Framework',d:26},{n:'Key Terms (1)',d:29},{n:'Key Terms (2)',d:17},
+        {n:'Provisions Sections 1-8',d:34},{n:'Objective & Scope',d:45},
+        {n:'Fundamentals of Compliance',d:28},{n:'Time-Weighted Return',d:58},
+        {n:'Miscellaneous Return Topics',d:36},{n:'Composite TWR Calculations',d:33},
+        {n:'Qualifying Portfolios',d:24},{n:'Including/Excluding Portfolios',d:30},
+        {n:'Presentation & Reporting',d:50},{n:'Verification & Disclosures',d:37},
+        {n:'Provisions Sec 1 (Key)',d:24},{n:'Provisions Sec 2 (Key)',d:35},
+        {n:'Provisions Sec 3-4 (Key)',d:24},{n:'Provisions Sec 1 (Other)',d:32},
+        {n:'Provisions Sec 2-4 (Other)',d:33}
+      ], ex:23 }
+    ]
+  },
+  {
+    id:'deriv', name:'衍生', weight:'10-15%',
+    modules:[
+      { name:'M3 Currency Management', lessons:[
+        {n:'Introduction',d:33},{n:'Review of FX Concepts',d:22},{n:'Forward Contract MTM',d:26},
+        {n:'FX Swap',d:12},{n:'Currency Option Basics',d:23},{n:'Calculating Domestic Returns',d:32},
+        {n:'Currency Risk',d:44},{n:'Currency Mgmt Strategies',d:30},
+        {n:'Factors Shift Strategic Decision',d:26},{n:'Fundamentals & Technical Analysis',d:13},
+        {n:'The Carry Trade',d:44},{n:'Volatility Trading',d:18},{n:'Tactical Decision Factors',d:14},
+        {n:'Forward Contracts & Hedge Ratios',d:35},{n:'Roll Yield',d:27},
+        {n:'Example: Hedging & Roll Yield',d:24},{n:'Over-/Under-Hedging',d:8},
+        {n:'Protective Put & Risk Reversal',d:25},{n:'Put Spread & Seagull',d:12},
+        {n:'Exotic Options & Summary',d:16},{n:'Examples',d:18},{n:'Hedging Multiple Currencies',d:9},
+        {n:'Cross Hedges & Macro Hedges',d:12},{n:'Min-Variance Hedge Ratio',d:46},
+        {n:'EM Currencies & Summary',d:24}
+      ], ex:35 },
+      { name:'M1 Options Strategies', lessons:[
+        {n:'Introduction',d:12},{n:'Review of Option',d:22},{n:'Synthetic Forward',d:34},
+        {n:'Synthetic Put and Call',d:14},{n:'Review of Greeks',d:41},
+        {n:'Covered Calls - Objectives',d:41},{n:'Covered Calls - P&L',d:24},
+        {n:'Protective Puts',d:19},{n:'Long/Short Forward Equivalence',d:9},
+        {n:'Writing Puts',d:34},{n:'Summary & Example',d:29},{n:'Bull Spread',d:49},
+        {n:'Bear Spread',d:33},{n:'Straddle',d:36},{n:'Collar',d:49},
+        {n:'Calendar Spread',d:29},{n:'Summary',d:35},{n:'Implied Volatility',d:26},
+        {n:'Vol Smile & Skew',d:25},{n:'Term Structure of Vol',d:9},
+        {n:'Strategy Selection',d:31},{n:'Ex: Covered Call & Put Writing',d:35},
+        {n:'Ex: Straddle & Collar',d:9},{n:'Ex: Calendar Spread',d:20},
+        {n:'Ex: Hedging Volatility',d:11},{n:'Ex: Long Call & Protective Put',d:15}
+      ], ex:23 },
+      { name:'M2 Swaps, Forwards & Futures', lessons:[
+        {n:'Introduction',d:12},{n:'IR Swaps - Cash Flow Risk',d:41},
+        {n:'IR Swaps - Market Value Risk',d:21},{n:'IR Forwards & Futures',d:26},
+        {n:'Fixed Income Futures',d:41},{n:'Currency Swaps',d:35},{n:'Common Use of Ccy Swaps',d:30},
+        {n:'Ccy Forwards & Futures',d:11},{n:'Equity Swaps',d:32},{n:'Equity Forwards & Futures',d:36},
+        {n:'Summary',d:23},{n:'Vol Futures (1)',d:47},{n:'Vol Futures (2)',d:40},
+        {n:'VIX Options',d:7},{n:'Variance Swaps - Payoff',d:37},{n:'Variance Swaps - Value',d:35},
+        {n:'Example 1-2',d:21},{n:'Example 3.1',d:47},{n:'Example 3.2-3.3',d:23},
+        {n:'Inferring Market Expectations',d:39},{n:'Summary',d:11}
+      ], ex:26 }
+    ]
+  },
+  {
+    id:'ethics', name:'道德', weight:'10-15%',
+    modules:[
+      { name:'M1 Ethics Learning Tips', lessons:[
+        {n:'Learning Tips of Ethics in L3',d:25}
+      ], ex:0 },
+      { name:'M2 Code of Ethics & Standards', lessons:[
+        {n:'Code of Ethics',d:8},{n:'Framework of Standards I-VII',d:6},
+        {n:'I(A) Knowledge of The Law',d:36},{n:'I(B) Independence & Objectivity',d:59},
+        {n:'I(C) Misrepresentation',d:35},{n:'I(D) Misconduct',d:6},
+        {n:'I(E) Competence',d:56},{n:'II(A) Material Nonpublic Info',d:31},
+        {n:'II(B) Market Manipulation',d:6},{n:'III(A) Loyalty, Prudence, Care',d:23},
+        {n:'III(B) Fair Dealing',d:11},{n:'III(C) Suitability',d:16},
+        {n:'III(D) Performance Presentation',d:23},{n:'III(E) Preservation of Confidentiality',d:9},
+        {n:'IV(A) Loyalty',d:45},{n:'IV(B) Additional Compensation',d:6},
+        {n:'IV(C) Responsibilities of Supervisors',d:8},{n:'V(A) Diligence & Reasonable Basis',d:11},
+        {n:'V(B) Communication with Clients',d:23},{n:'V(C) Record Retention',d:4},
+        {n:'VI(A) Avoid/Disclose Conflicts',d:17},{n:'VI(B) Priority of Transactions',d:6},
+        {n:'VI(C) Referral Fees',d:11}
+      ], ex:87 },
+      { name:'M3 Asset Manager Code', lessons:[
+        {n:'Introduction',d:27},{n:'1. Loyalty to Clients',d:19},
+        {n:'2. Investment Process & Actions',d:28},{n:'3. Trading',d:24},
+        {n:'4. Risk Mgmt, Compliance, Support',d:33},{n:'5. Performance & Valuation',d:8},
+        {n:'6. Disclosures',d:19}
+      ], ex:24 }
+    ]
+  }
+];
+
+// ============================================================
+// STATE
+// ============================================================
+const DB='cfa3v4';
+let st=load(), timerInterval=null, timerStart=null, timerElapsed=0;
+let calMonth=new Date().getMonth(), calYear=new Date().getFullYear(), currentSubj=null;
+
+function defaults(){
+  const ch={};
+  S.forEach(s=>{ch[s.id]=s.modules.map(m=>({b:m.lessons.map(()=>false),e:false,i:false}));});
+  ['cme','aa'].forEach(sid=>{ch[sid].forEach(m=>{m.b=m.b.map(()=>true);m.e=true;m.i=true;});});
+  return {ch,rec:[],ver:5};
+}
+function migrate(s){
+  // Ensure stored state matches current S structure
+  if(!s.ch)s.ch={};
+  S.forEach(sub=>{
+    if(!s.ch[sub.id]){
+      // New subject: initialize
+      s.ch[sub.id]=sub.modules.map(m=>({b:m.lessons.map(()=>false),e:false,i:false}));
+      return;
+    }
+    const stored=s.ch[sub.id];
+    const needed=sub.modules.length;
+    // Adjust module count
+    while(stored.length<needed)stored.push({b:[],e:false,i:false});
+    if(stored.length>needed)stored.length=needed;
+    // Adjust lesson count per module
+    sub.modules.forEach((m,i)=>{
+      const mod=stored[i];
+      if(!mod.b)mod.b=[];
+      const len=m.lessons.length;
+      if(mod.b.length<len){
+        while(mod.b.length<len)mod.b.push(false);
+      }else if(mod.b.length>len){
+        mod.b.length=len;
+      }
+    });
+  });
+  // Remove stale subject keys
+  Object.keys(s.ch).forEach(k=>{if(!S.find(x=>x.id===k))delete s.ch[k];});
+  s.ver=5;
+  return s;
+}
+function load(){try{const r=localStorage.getItem(DB);if(r){const s=JSON.parse(r);return migrate(s);}}catch(e){}return defaults();}
+function save(){localStorage.setItem(DB,JSON.stringify(st));}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function getToday(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function todayH(){const t=getToday();return st.rec.filter(r=>r.d===t).reduce((s,r)=>s+r.h,0);}
+function totalH(){return st.rec.reduce((s,r)=>s+r.h,0);}
+function streak(){
+  const dates=[...new Set(st.rec.map(r=>r.d))].sort().reverse();
+  if(!dates.length)return 0;
+  const today=getToday();
+  const yd=(()=>{const d=new Date();d.setDate(d.getDate()-1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;})();
+  if(dates[0]!==today&&dates[0]!==yd)return 0;
+  let s=0,cur=new Date(dates[0]+'T00:00:00');
+  for(const ds of dates){const d=new Date(ds+'T00:00:00');const exp=new Date(cur);exp.setDate(exp.getDate()-s);if(d.getTime()===exp.getTime())s++;else break;}
+  return s;
+}
+function countAll(){
+  let tL=0,dL=0,tE=0,dE=0,tI=0,dI=0;
+  S.forEach(s=>{s.modules.forEach((m,i)=>{const c=st.ch[s.id][i];tL+=m.lessons.length;dL+=c.b.filter(Boolean).length;tE++;if(c.e)dE++;tI++;if(c.i)dI++;});});
+  return {tL,dL,tE,dE,tI,dI};
+}
+
+// ============================================================
+// QUOTES & GREETINGS
+// ============================================================
+const QUOTES=[
+  ['The pain of discipline is far less than the pain of regret.',''],
+  ['成功不是终点，重要的是继续前行的勇气。','丘吉尔'],
+  ['不积跬步，无以至千里。','荀子'],
+  ['Stay hungry, stay foolish.','Steve Jobs'],
+  ['你不需要很厉害才能开始，你需要开始才能很厉害。',''],
+  ['Consistency transforms average into excellence.',''],
+  ['今天的努力，是明天的底气。',''],
+  ['把每一天当作最后的冲刺。',''],
+  ['机会总是留给有准备的人。','巴斯德'],
+  ['种一棵树最好的时间是十年前，其次是现在。',''],
+  ['每多学一个知识点，就离CFA Charter更近一步。',''],
+  ['You are braver than you believe and stronger than you seem.',''],
+];
+
+function getGreeting(){
+  const h=new Date().getHours();
+  if(h<6)return['夜猫子学霸','深夜学习辛苦了，注意休息~'];
+  if(h<12)return['早安','新的一天，元气满满!'];
+  if(h<14)return['午安','吃饱了继续冲!'];
+  if(h<18)return['下午好','下午茶时间也要保持专注哦~'];
+  return['晚上好','晚间学习效率最高!'];
+}
+
+function getDailyMsg(h){
+  if(h===0)return'今天还没开始学习，快来打卡吧~';
+  if(h<1)return'不错的开始，继续加油!';
+  if(h<2)return'已经很棒了，再坚持一会儿!';
+  if(h<2.6)return'快达标了，冲冲冲!';
+  return'今日目标已达成，太厉害了!';
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render(){
+  const[gt,gs]=getGreeting();
+  document.getElementById('greeting-title').textContent=gt;
+  document.getElementById('greeting-sub').textContent=gs;
+  const exam=new Date(2026,7,14),now=new Date();now.setHours(0,0,0,0);
+  document.getElementById('cd-days').textContent=Math.ceil((exam-now)/864e5);
+  document.getElementById('s-streak').textContent=streak();
+  document.getElementById('s-hours').textContent=totalH().toFixed(1);
+  const c=countAll();
+  document.getElementById('s-lessons').textContent=`${c.dL}/${c.tL}`;
+  const th=todayH();
+  document.getElementById('today-h').textContent=th.toFixed(1);
+  document.getElementById('today-bar').style.width=Math.min(100,(th/2.6)*100)+'%';
+  document.getElementById('dg-msg').textContent=getDailyMsg(th);
+  const total=c.tL+c.tE+c.tI, done=c.dL+c.dE+c.dI;
+  const pct=total?done/total:0;
+  const circ=2*Math.PI*42;
+  document.getElementById('ring-fg').style.strokeDashoffset=circ*(1-pct);
+  document.getElementById('ring-pct').textContent=Math.round(pct*100)+'%';
+  document.getElementById('ri-b').textContent=c.dL;document.getElementById('ri-bt').textContent=c.tL;
+  document.getElementById('ri-e').textContent=c.dE;document.getElementById('ri-et').textContent=c.tE;
+  document.getElementById('ri-i').textContent=c.dI;document.getElementById('ri-it').textContent=c.tI;
+  const q=QUOTES[new Date().getDate()%QUOTES.length];
+  document.getElementById('q-text').textContent=`"${q[0]}"`;
+  document.getElementById('q-auth').textContent=q[1]?`— ${q[1]}`:'';
+  renderSubjects();
+  if(currentSubj)renderDetail(currentSubj);
+}
+
+function renderSubjects(){
+  const list=document.getElementById('subj-list');
+  let html='';
+  S.forEach(s=>{
+    const mods=st.ch[s.id];
+    let total=0,done=0;
+    s.modules.forEach((m,i)=>{total+=m.lessons.length+2;done+=mods[i].b.filter(Boolean).length+(mods[i].e?1:0)+(mods[i].i?1:0);});
+    const pct=total?Math.round(done/total*100):0;
+    const allDone=pct===100;
+    const tag=allDone?'<span class="subj-tag tag-done">&#x2728; 已完成</span>':pct>0?`<span class="subj-tag tag-cur">${pct}%</span>`:'<span class="subj-tag tag-todo">待开始</span>';
+    const totalLessons=s.modules.reduce((a,m)=>a+m.lessons.length,0);
+    const totalEx=s.modules.reduce((a,m)=>a+m.ex,0);
+    html+=`<div class="subj-card ${allDone?'done':''}" onclick="openDetail('${s.id}')">
+      <div class="subj-top"><span class="subj-name">${s.name}</span>${tag}</div>
+      <div class="subj-bar"><div class="subj-bar-fill" style="width:${pct}%"></div></div>
+      <div class="subj-meta"><span>${s.weight}</span><span>${totalLessons} 课时</span><span>${totalEx} 题</span></div>
+    </div>`;
+  });
+  list.innerHTML=html;
+}
+
+function renderDetail(sid){
+  const s=S.find(x=>x.id===sid);if(!s)return;
+  document.getElementById('det-title').textContent=s.name;
+  const mods=st.ch[sid];
+  let total=0,done=0;
+  s.modules.forEach((m,i)=>{total+=m.lessons.length+2;done+=mods[i].b.filter(Boolean).length+(mods[i].e?1:0)+(mods[i].i?1:0);});
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('det-progress').innerHTML=`完成 <span>${done}</span> / ${total} 项 (${pct}%)`;
+  let html='';
+  s.modules.forEach((m,mi)=>{
+    const mc=mods[mi];const mDone=mc.b.filter(Boolean).length;const mTotal=m.lessons.length;
+    const totalMin=m.lessons.reduce((a,l)=>a+l.d,0);
+    const isOpen=mDone<mTotal||!mc.e||!mc.i;
+    html+=`<div class="module-card">
+      <div class="module-header" onclick="toggleMod(this)">
+        <span class="name">${m.name}</span>
+        <span class="badge">${mDone+((mc.e?1:0)+(mc.i?1:0))}/${mTotal+2}</span>
+        <span class="arrow ${isOpen?'open':''}">&rsaquo;</span>
+      </div>
+      <div class="module-body ${isOpen?'show':''}">
+        <div class="mod-info">&#x1F4DA; 基础课 ${mTotal}节 &middot; ${Math.round(totalMin/60*10)/10}h &middot; ${m.ex}道课后题</div>`;
+    m.lessons.forEach((l,li)=>{
+      const ck=mc.b[li];
+      html+=`<div class="lesson-item">
+        <button class="lesson-cb ${ck?'checked':''}" onclick="event.stopPropagation();togL('${sid}',${mi},${li})">&#10003;</button>
+        <span class="lesson-name ${ck?'checked':''}">${l.n}</span>
+        <span class="lesson-dur">${l.d}m</span>
+      </div>`;
+    });
+    html+=`<div class="lesson-item" style="margin-top:6px;padding-top:10px;border-top:2px dashed var(--border)">
+      <button class="lesson-cb ${mc.e?'checked':''}" onclick="event.stopPropagation();togE('${sid}',${mi})">&#10003;</button>
+      <span class="lesson-special ${mc.e?'checked':''}">&#x270F;&#xFE0F; 课后题 (${m.ex}道)</span>
+    </div>
+    <div class="lesson-item">
+      <button class="lesson-cb ${mc.i?'checked':''}" onclick="event.stopPropagation();togI('${sid}',${mi})">&#10003;</button>
+      <span class="lesson-special ${mc.i?'checked':''}">&#x1F525; 强化课</span>
+    </div>
+    </div></div>`;
+  });
+  document.getElementById('det-content').innerHTML=html;
+}
+
+function renderCalendar(){
+  const grid=document.getElementById('cal-grid');
+  const mn=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  document.getElementById('cal-month').textContent=`${calYear}年 ${mn[calMonth]}`;
+  const dn=['日','一','二','三','四','五','六'];
+  let html=dn.map(d=>`<div class="cal-hdr">${d}</div>`).join('');
+  const fd=new Date(calYear,calMonth,1).getDay();
+  const dim=new Date(calYear,calMonth+1,0).getDate();
+  const today=getToday();
+  const hm={};
+  st.rec.forEach(r=>{const d=new Date(r.d);if(d.getFullYear()===calYear&&d.getMonth()===calMonth)hm[d.getDate()]=(hm[d.getDate()]||0)+r.h;});
+  for(let i=0;i<fd;i++)html+='<div class="cal-day"></div>';
+  for(let d=1;d<=dim;d++){
+    const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const h=hm[d]||0;const isT=ds===today;
+    const lv=h>=3?'lv4':h>=2?'lv3':h>=1?'lv2':h>0?'lv1':'';
+    html+=`<div class="cal-day ${lv} ${h>0?'has-data':''} ${isT?'today':''}" title="${h?h.toFixed(1)+'h':''}">${d}</div>`;
+  }
+  grid.innerHTML=html;
+  const hl=document.getElementById('hist-list');
+  const mr={};
+  st.rec.forEach(r=>{const d=new Date(r.d);if(d.getFullYear()===calYear&&d.getMonth()===calMonth){
+    if(!mr[r.d])mr[r.d]={h:0,ss:[]};mr[r.d].h+=r.h;
+    if(r.s){const sn=S.find(x=>x.id===r.s);if(sn&&!mr[r.d].ss.includes(sn.name))mr[r.d].ss.push(sn.name);}
+  }});
+  const sd=Object.keys(mr).sort().reverse();
+  let hh='';
+  sd.forEach(date=>{const rec=mr[date];
+    hh+=`<div class="history-item"><div><div class="history-date">${date}</div><div class="history-detail">${rec.ss.join(', ')||'学习'}</div></div>
+    <div style="display:flex;align-items:center;gap:8px"><div><span class="history-hours">${rec.h.toFixed(1)}</span><span class="history-unit">h</span></div>
+    <button class="history-del" onclick="delRec('${date}')">&times;</button></div></div>`;
+  });
+  hl.innerHTML=hh||'<div style="text-align:center;color:var(--text2);padding:20px;font-size:13px">本月暂无记录</div>';
+}
+
+// ============================================================
+// ACTIONS
+// ============================================================
+function showPage(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  if(name==='calendar')renderCalendar();
+  if(name==='subjects')renderSubjects();
+}
+function openDetail(sid){
+  currentSubj=sid;renderDetail(sid);
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-detail').classList.add('active');
+}
+function backToList(){currentSubj=null;showPage('subjects',document.querySelectorAll('.nav-item')[1]);}
+function toggleMod(el){el.nextElementSibling.classList.toggle('show');el.querySelector('.arrow').classList.toggle('open');}
+
+function celebrate(msg){
+  const el=document.getElementById('celebrate');el.textContent=msg;el.style.display='block';
+  setTimeout(()=>{el.style.display='none';},2500);
+}
+
+function togL(sid,mi,li){
+  const was=st.ch[sid][mi].b[li];
+  st.ch[sid][mi].b[li]=!was;save();render();
+  if(!was){
+    const m=S.find(x=>x.id===sid).modules[mi];
+    const done=st.ch[sid][mi].b.filter(Boolean).length;
+    if(done===m.lessons.length)celebrate(`${m.name} 基础课全部完成!`);
+  }
+}
+function togE(sid,mi){st.ch[sid][mi].e=!st.ch[sid][mi].e;save();render();}
+function togI(sid,mi){
+  const was=st.ch[sid][mi].i;
+  st.ch[sid][mi].i=!was;save();render();
+  if(!was){
+    const s=S.find(x=>x.id===sid);
+    const allDone=st.ch[sid].every(m=>m.b.every(Boolean)&&m.e&&m.i);
+    if(allDone)celebrate(`${s.name} 全部完成! 太棒了!`);
+  }
+}
+
+function toggleTimer(){
+  const btn=document.getElementById('btn-timer');
+  if(timerInterval){
+    clearInterval(timerInterval);timerInterval=null;
+    const hours=timerElapsed/3600;
+    if(hours>=0.01){
+      st.rec.push({d:getToday(),s:document.getElementById('timer-sel').value,h:Math.round(hours*100)/100});
+      save();
+    }
+    timerElapsed=0;timerStart=null;
+    btn.innerHTML='&#x25B6; 开始学习';btn.classList.remove('running');
+    document.getElementById('timer-disp').textContent='00:00:00';
+    render();
+  }else{
+    timerStart=Date.now();timerElapsed=0;
+    btn.innerHTML='&#x23F9; 结束学习';btn.classList.add('running');
+    timerInterval=setInterval(()=>{
+      timerElapsed=(Date.now()-timerStart)/1000;
+      const h=Math.floor(timerElapsed/3600),m=Math.floor((timerElapsed%3600)/60),s=Math.floor(timerElapsed%60);
+      document.getElementById('timer-disp').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    },1000);
+  }
+}
+
+function openManual(){
+  const sel=document.getElementById('m-subj');
+  sel.innerHTML=S.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  sel.value=document.getElementById('timer-sel').value;
+  document.getElementById('m-hours').value='';
+  document.getElementById('m-date').value=getToday();
+  document.getElementById('modal-manual').classList.add('show');
+}
+function closeModal(){document.getElementById('modal-manual').classList.remove('show');}
+function saveManual(){
+  const subj=document.getElementById('m-subj').value;
+  const hours=parseFloat(document.getElementById('m-hours').value);
+  const date=document.getElementById('m-date').value;
+  if(!hours||hours<=0||!date)return alert('请填写完整');
+  st.rec.push({d:date,s:subj,h:Math.round(hours*100)/100});
+  save();closeModal();render();
+}
+function delRec(date){if(!confirm(`删除 ${date} 的所有记录？`))return;st.rec=st.rec.filter(r=>r.d!==date);save();render();renderCalendar();}
+function calNav(dir){calMonth+=dir;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
+
+function init(){
+  const sel=document.getElementById('timer-sel');
+  sel.innerHTML=S.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  const first=S.find(s=>!st.ch[s.id].every(m=>m.b.every(Boolean)));
+  if(first)sel.value=first.id;
+  render();
+}
+document.addEventListener('visibilitychange',()=>{if(timerStart&&!document.hidden)timerElapsed=(Date.now()-timerStart)/1000;});
+
+// ============================================================
+// FLASHCARD DATA & LOGIC
+// ============================================================
+const FC_BASE = '品职教育2026年CFA三级Flashcard（图片版）/';
+const FC_MAP = {
+  cme:   { path: FC_BASE+'core/品职教育2026年CFA三级Flashcard_Core_CME/', prefix:'品职教育2026年CFA三级Flashcard_Core_CME_', count:35, skip:[1,2,18] },
+  aa:    { path: FC_BASE+'core/品职教育2026年CFA三级Flashcard_Core_Asset Allocation/', prefix:'品职教育2026年CFA三级Flashcard_Core_Asset Allocation_', count:21, skip:[1,2,10,18] },
+  ips_p: { path: FC_BASE+'core/品职教育2026年CFA三级Flashcard_Core_个人IPS/', prefix:'品职教育2026年CFA三级Flashcard_Core_个人IPS_', count:35, skip:[1,2,35] },
+  ips_i: { path: FC_BASE+'core/品职教育2026年CFA三级Flashcard_Core_机构IPS/', prefix:'品职教育2026年CFA三级Flashcard_Core_机构IPS_', count:47, skip:[1,2,42] },
+  equity:{ path: FC_BASE+'core/品职教育2026年CFA三级Flashcard_Core_Equity/', prefix:'品职教育2026年CFA三级Flashcard_Core_Equity_', count:10, skip:[1,2] },
+  fi:    { path: FC_BASE+'core/品职教育2026年CFA三级Flashcard_Core_Fixed-income/', prefix:'品职教育2026年CFA三级Flashcard_Core_Fixed-income_', count:22, skip:[1,2] },
+  alts:  { path: FC_BASE+'core/品职教育2026年CFA三级Flashcard_Core_Alternatives/', prefix:'品职教育2026年CFA三级Flashcard_Core_Alternatives_', count:8, skip:[1,2] },
+  trading:{ path: FC_BASE+'core/品职教育2026年CFA三级Flashcard_Core_Trading/', prefix:'品职教育2026年CFA三级Flashcard_Core_Trading_', count:11, skip:[1,2] },
+  perf:  { path: FC_BASE+'core/品职教育2026年CFA三级Flashcard_Core_Performance/', prefix:'品职教育2026年CFA三级Flashcard_Core_Performance_', count:25, skip:[1,2,16] },
+  gips:  { path: FC_BASE+'core/品职教育2026年CFA三级Flashcard_Core_GIPS/', prefix:'品职教育2026年CFA三级Flashcard_Core_GIPS_', count:20, skip:[1,2] },
+  deriv: { path: FC_BASE+'core/品职教育2026年CFA三级Flashcard_Core_Derivatives/', prefix:'品职教育2026年CFA三级Flashcard_Core_Derivatives_', count:23, skip:[1,2,7,13] },
+  ethics:{ path: FC_BASE+'core/品职教育2026年CFA三级Flashcard_Core_Ethics/', prefix:'品职教育2026年CFA三级Flashcard_Core_Ethics_', count:38, skip:[1,2] },
+  pw_equity:{ path: FC_BASE+'pathway-portfolio/品职教育2026年CFA三级Flashcard_Portfolio Mgmt Pathway_Equity/', prefix:'品职教育2026年CFA三级Flashcard_Portfolio Mgmt Pathway_Equity_', count:34, skip:[1,2,9,22] },
+  pw_fi: { path: FC_BASE+'pathway-portfolio/品职教育2026年CFA三级Flashcard_Portfolio Mgmt Pathway_Fixed-income/', prefix:'品职教育2026年CFA三级Flashcard_Portfolio Mgmt Pathway_Fixed-income_', count:56, skip:[1,2,13,30] },
+  pw_trading:{ path: FC_BASE+'pathway-portfolio/品职教育2026年CFA三级Flashcard_Portfolio Mgmt Pathway_Trading/', prefix:'品职教育2026年CFA三级Flashcard_Portfolio Mgmt Pathway_Trading_', count:20, skip:[1,2] },
+};
+// pw_ips_i has no flashcard
+
+const FC_DB='cfa3_fc';
+let fcState = loadFC();
+let fcCurrent = { sid:null, cards:[], idx:0, mode:'all', filtered:[] };
+
+function loadFC(){try{const r=localStorage.getItem(FC_DB);if(r)return JSON.parse(r);}catch(e){}return {};}
+function saveFC(){localStorage.setItem(FC_DB,JSON.stringify(fcState));}
+
+function getFCCards(sid){
+  const m=FC_MAP[sid]; if(!m)return [];
+  const cards=[];
+  for(let i=1;i<=m.count;i++){
+    if(m.skip.includes(i))continue;
+    const num=String(i).padStart(2,'0');
+    cards.push({src:m.path+m.prefix+num+'.png', id:sid+'_'+num});
+  }
+  return cards;
+}
+
+function getFCStatus(sid){
+  const cards=getFCCards(sid);
+  if(!cards.length)return null;
+  const mastered=cards.filter(c=>fcState[c.id]==='got').length;
+  return {total:cards.length, mastered, review:cards.length-mastered};
+}
+
+function openFC(sid){
+  const cards=getFCCards(sid);
+  if(!cards.length)return;
+  const subj=S.find(s=>s.id===sid);
+  fcCurrent.sid=sid;
+  fcCurrent.cards=cards;
+  fcCurrent.mode='all';
+  applyFCMode();
+  fcCurrent.idx=0;
+  document.getElementById('fc-title').textContent=(subj?subj.name:sid)+' 闪卡';
+  document.getElementById('fc-mode-all').classList.add('active');
+  document.getElementById('fc-mode-review').classList.remove('active');
+  document.getElementById('fc-mode-shuffle').classList.remove('active');
+  renderFC();
+  document.getElementById('fc-page').classList.add('show');
+}
+
+function closeFC(){
+  document.getElementById('fc-page').classList.remove('show');
+  if(currentSubj)renderDetail(currentSubj);
+  render();
+}
+
+function setFCMode(mode){
+  fcCurrent.mode=mode;
+  ['all','review','shuffle'].forEach(m=>{
+    document.getElementById('fc-mode-'+m).classList.toggle('active',m===mode);
+  });
+  applyFCMode();
+  fcCurrent.idx=0;
+  renderFC();
+}
+
+function applyFCMode(){
+  let cards=[...fcCurrent.cards];
+  if(fcCurrent.mode==='review'){
+    cards=cards.filter(c=>fcState[c.id]!=='got');
+  }else if(fcCurrent.mode==='shuffle'){
+    for(let i=cards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cards[i],cards[j]]=[cards[j],cards[i]];}
+  }
+  fcCurrent.filtered=cards;
+}
+
+function renderFC(){
+  const cards=fcCurrent.filtered;
+  const idx=fcCurrent.idx;
+  const allCards=fcCurrent.cards;
+  const mastered=allCards.filter(c=>fcState[c.id]==='got').length;
+  const review=allCards.length-mastered;
+
+  document.getElementById('fc-mastered').textContent=mastered+' 已掌握';
+  document.getElementById('fc-review').textContent=review+' 待复习';
+
+  if(!cards.length||idx>=cards.length){
+    // Summary
+    document.getElementById('fc-body').innerHTML=`<div class="fc-summary">
+      <div class="emoji">${review===0?'&#x1F389;':'&#x1F4AA;'}</div>
+      <h2>${review===0?'全部掌握!':'本轮完成!'}</h2>
+      <p>${review===0?'太棒了，这个科目的闪卡全部掌握了!':'还有 '+review+' 张需要复习，继续加油!'}</p>
+      <div class="stats-row">
+        <div class="stat-item"><div class="stat-num" style="color:var(--green)">${mastered}</div><div class="stat-label">已掌握</div></div>
+        <div class="stat-item"><div class="stat-num" style="color:var(--accent)">${review}</div><div class="stat-label">待复习</div></div>
+      </div>
+      <button onclick="${review>0?'setFCMode(\"review\")':'closeFC()'}">
+        ${review>0?'&#x1F50D; 复习待掌握':'&#x2705; 返回'}</button>
+    </div>`;
+    document.getElementById('fc-actions').style.display='none';
+    document.getElementById('fc-counter').textContent='完成';
+    document.getElementById('fc-bar').style.width='100%';
+    return;
+  }
+
+  const card=cards[idx];
+  document.getElementById('fc-actions').style.display='flex';
+  document.getElementById('fc-counter').textContent=`${idx+1}/${cards.length}`;
+  document.getElementById('fc-bar').style.width=((idx+1)/cards.length*100)+'%';
+
+  // Reset to image view
+  document.getElementById('fc-body').innerHTML=`<div class="fc-img-wrap" id="fc-img-wrap">
+    <img id="fc-img" src="${card.src}" alt="flashcard" style="width:100%;display:block">
+    <div class="fc-mask" id="fc-mask" onclick="revealFC()">
+      <div class="fc-mask-hint">点击查看答案</div>
+    </div>
+  </div>`;
+}
+
+function revealFC(){
+  const mask=document.getElementById('fc-mask');
+  if(mask)mask.classList.add('revealed');
+}
+
+function fcRate(rating){
+  const cards=fcCurrent.filtered;
+  const idx=fcCurrent.idx;
+  if(idx>=cards.length)return;
+  const card=cards[idx];
+  if(rating==='got'){
+    fcState[card.id]='got';
+  }else{
+    delete fcState[card.id];
+  }
+  saveFC();
+  fcCurrent.idx++;
+  renderFC();
+}
+
+// Override renderDetail to add flashcard button
+const _origRenderDetail = renderDetail;
+renderDetail = function(sid){
+  _origRenderDetail(sid);
+  const fc=FC_MAP[sid];
+  if(!fc)return;
+  const status=getFCStatus(sid);
+  if(!status)return;
+  const det=document.getElementById('det-content');
+  const btn=document.createElement('div');
+  btn.className='fc-entry-btn';
+  btn.onclick=()=>openFC(sid);
+  btn.innerHTML=`&#x1F0CF; 闪卡复习 <span class="fc-entry-count">${status.mastered}/${status.total} 已掌握</span>`;
+  det.insertBefore(btn, det.firstChild);
+};
+
+init();
+</script>
+</body>
+</html>
