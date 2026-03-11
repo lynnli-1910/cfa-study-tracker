@@ -133,23 +133,35 @@ body {
 .cal-month { font-size:15px; font-weight:700; }
 .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
 .cal-hdr { text-align:center; font-size:11px; color:var(--text2); padding:4px 0; font-weight:600; }
-.cal-day { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:12px; border-radius:10px; color:var(--text2); font-weight:600; }
-.cal-day.has-data { color:var(--text); }
+.cal-day { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:12px; border-radius:10px; color:var(--text2); font-weight:600; position:relative; }
+.cal-day.studied { background:var(--green2); color:var(--green); font-weight:700; }
 .cal-day.today { border:2px solid var(--accent); color:var(--accent); }
-.cal-day.lv1 { background:#fff3e0; }
-.cal-day.lv2 { background:#ffe0b2; }
-.cal-day.lv3 { background:#ffcc80; }
-.cal-day.lv4 { background:#ffab40; color:#fff; }
-.cal-legend { display:flex; justify-content:center; gap:6px; align-items:center; margin-top:10px; font-size:11px; color:var(--text2); }
-.cal-legend-box { width:14px; height:14px; border-radius:4px; }
+.cal-day.today.studied { border-color:var(--green); color:var(--green); }
+.cal-streak-info { text-align:center; margin-top:12px; font-size:13px; color:var(--text2); }
+.cal-streak-info span { color:var(--accent); font-weight:800; font-size:18px; }
 
 .history-section { padding:12px 20px; }
-.history-item { background:var(--card); border-radius:14px; padding:12px 16px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; box-shadow:var(--shadow); }
-.history-date { font-size:13px; font-weight:700; }
-.history-detail { font-size:12px; color:var(--text2); margin-top:2px; }
-.history-hours { font-size:18px; font-weight:800; color:var(--accent); }
-.history-unit { font-size:11px; color:var(--text2); }
-.history-del { color:var(--accent2); font-size:18px; cursor:pointer; padding:4px 8px; border:none; background:none; opacity:.5; }
+.history-item { background:var(--card); border-radius:14px; padding:12px 16px; margin-bottom:8px; box-shadow:var(--shadow); }
+.history-date { font-size:13px; font-weight:700; color:var(--accent); margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; }
+.history-date .count { font-size:12px; color:var(--text2); font-weight:600; }
+.history-lessons { display:flex; flex-wrap:wrap; gap:4px; }
+.history-tag { font-size:11px; padding:3px 8px; border-radius:8px; background:var(--green2); color:var(--green); font-weight:600; }
+.history-tag.ex { background:#fff3e0; color:var(--accent); }
+
+/* Share button */
+.share-btn { display:flex; align-items:center; justify-content:center; gap:8px; margin:12px 20px; padding:14px; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; border:none; border-radius:16px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; box-shadow:0 4px 15px rgba(255,138,101,0.3); width:calc(100% - 40px); }
+.share-btn:active { transform:scale(.97); }
+.share-btn:disabled { opacity:.5; cursor:default; }
+
+/* Share preview modal */
+.share-modal { position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:200; display:none; align-items:center; justify-content:center; padding:20px; }
+.share-modal.show { display:flex; }
+.share-modal-inner { background:var(--card); border-radius:20px; padding:20px; max-width:400px; width:100%; max-height:85vh; overflow-y:auto; }
+.share-modal-inner canvas { width:100%; border-radius:12px; }
+.share-modal-btns { display:flex; gap:10px; margin-top:14px; }
+.share-modal-btns button { flex:1; padding:12px; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; }
+.share-modal-btns .btn-dl { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+.share-modal-btns .btn-close { background:var(--card2); color:var(--text); }
 
 /* Bottom Nav */
 .bottom-nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; background:var(--card); border-top:1px solid var(--border); display:flex; padding:6px 0; padding-bottom:max(6px,env(safe-area-inset-bottom)); z-index:100; box-shadow:0 -2px 10px rgba(0,0,0,0.04); }
@@ -244,9 +256,21 @@ body {
   <div class="calendar-section">
     <div class="cal-nav"><button onclick="calNav(-1)">&lt;</button><div class="cal-month" id="cal-month"></div><button onclick="calNav(1)">&gt;</button></div>
     <div class="cal-grid" id="cal-grid"></div>
-    <div class="cal-legend"><span>少</span><div class="cal-legend-box lv1"></div><div class="cal-legend-box lv2"></div><div class="cal-legend-box lv3"></div><div class="cal-legend-box lv4"></div><span>多</span></div>
+    <div class="cal-streak-info" id="cal-streak"></div>
   </div>
+  <button class="share-btn" id="share-btn" onclick="openShare()">&#x1F4F8; 生成今日学习卡片</button>
   <div class="history-section" id="hist-list"></div>
+</div>
+
+<!-- Share modal -->
+<div class="share-modal" id="share-modal">
+  <div class="share-modal-inner">
+    <canvas id="share-canvas"></canvas>
+    <div class="share-modal-btns">
+      <button class="btn-close" onclick="closeShare()">关闭</button>
+      <button class="btn-dl" onclick="downloadShare()">&#x1F4BE; 保存图片</button>
+    </div>
+  </div>
 </div>
 
 <!-- Modal -->
@@ -681,7 +705,7 @@ function defaults(){
   const ch={};
   S.forEach(s=>{ch[s.id]=s.modules.map(m=>({b:m.lessons.map(()=>false),e:false,i:false}));});
   ['cme','aa'].forEach(sid=>{ch[sid].forEach(m=>{m.b=m.b.map(()=>true);m.e=true;m.i=true;});});
-  return {ch,rec:[],ver:5};
+  return {ch,rec:[],log:[],days:[],ver:6};
 }
 function migrate(s){
   // Ensure stored state matches current S structure
@@ -711,7 +735,9 @@ function migrate(s){
   });
   // Remove stale subject keys
   Object.keys(s.ch).forEach(k=>{if(!S.find(x=>x.id===k))delete s.ch[k];});
-  s.ver=5;
+  if(!s.log)s.log=[];
+  if(!s.days)s.days=[];
+  s.ver=6;
   return s;
 }
 function load(){try{const r=localStorage.getItem(DB);if(r){const s=JSON.parse(r);return migrate(s);}}catch(e){}return defaults();}
@@ -724,7 +750,7 @@ function getToday(){const d=new Date();return `${d.getFullYear()}-${String(d.get
 function todayH(){const t=getToday();return st.rec.filter(r=>r.d===t).reduce((s,r)=>s+r.h,0);}
 function totalH(){return st.rec.reduce((s,r)=>s+r.h,0);}
 function streak(){
-  const dates=[...new Set(st.rec.map(r=>r.d))].sort().reverse();
+  const dates=[...new Set(st.days)].sort().reverse();
   if(!dates.length)return 0;
   const today=getToday();
   const yd=(()=>{const d=new Date();d.setDate(d.getDate()-1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;})();
@@ -732,6 +758,10 @@ function streak(){
   let s=0,cur=new Date(dates[0]+'T00:00:00');
   for(const ds of dates){const d=new Date(ds+'T00:00:00');const exp=new Date(cur);exp.setDate(exp.getDate()-s);if(d.getTime()===exp.getTime())s++;else break;}
   return s;
+}
+function markStudyDay(){
+  const today=getToday();
+  if(!st.days.includes(today))st.days.push(today);
 }
 function countAll(){
   let tL=0,dL=0,tE=0,dE=0,tI=0,dI=0;
@@ -878,30 +908,199 @@ function renderCalendar(){
   const fd=new Date(calYear,calMonth,1).getDay();
   const dim=new Date(calYear,calMonth+1,0).getDate();
   const today=getToday();
-  const hm={};
-  st.rec.forEach(r=>{const d=new Date(r.d);if(d.getFullYear()===calYear&&d.getMonth()===calMonth)hm[d.getDate()]=(hm[d.getDate()]||0)+r.h;});
+  const daySet=new Set(st.days);
   for(let i=0;i<fd;i++)html+='<div class="cal-day"></div>';
+  let monthStudied=0;
   for(let d=1;d<=dim;d++){
     const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const h=hm[d]||0;const isT=ds===today;
-    const lv=h>=3?'lv4':h>=2?'lv3':h>=1?'lv2':h>0?'lv1':'';
-    html+=`<div class="cal-day ${lv} ${h>0?'has-data':''} ${isT?'today':''}" title="${h?h.toFixed(1)+'h':''}">${d}</div>`;
+    const studied=daySet.has(ds);
+    if(studied)monthStudied++;
+    html+=`<div class="cal-day ${studied?'studied':''} ${ds===today?'today':''}">${d}</div>`;
   }
   grid.innerHTML=html;
+  const sk=streak();
+  document.getElementById('cal-streak').innerHTML=`本月学习 <span>${monthStudied}</span> 天 &middot; 连续打卡 <span>${sk}</span> 天`;
+
+  // Today's share button state
+  const todayLog=st.log.filter(l=>l.d===today);
+  document.getElementById('share-btn').disabled=todayLog.length===0;
+
+  // History: show recent study days with lessons
   const hl=document.getElementById('hist-list');
-  const mr={};
-  st.rec.forEach(r=>{const d=new Date(r.d);if(d.getFullYear()===calYear&&d.getMonth()===calMonth){
-    if(!mr[r.d])mr[r.d]={h:0,ss:[]};mr[r.d].h+=r.h;
-    if(r.s){const sn=S.find(x=>x.id===r.s);if(sn&&!mr[r.d].ss.includes(sn.name))mr[r.d].ss.push(sn.name);}
-  }});
-  const sd=Object.keys(mr).sort().reverse();
-  let hh='';
-  sd.forEach(date=>{const rec=mr[date];
-    hh+=`<div class="history-item"><div><div class="history-date">${date}</div><div class="history-detail">${rec.ss.join(', ')||'学习'}</div></div>
-    <div style="display:flex;align-items:center;gap:8px"><div><span class="history-hours">${rec.h.toFixed(1)}</span><span class="history-unit">h</span></div>
-    <button class="history-del" onclick="delRec('${date}')">&times;</button></div></div>`;
+  const logByDate={};
+  st.log.forEach(l=>{
+    const d=new Date(l.d);
+    if(d.getFullYear()===calYear&&d.getMonth()===calMonth){
+      if(!logByDate[l.d])logByDate[l.d]=[];
+      logByDate[l.d].push(l);
+    }
   });
-  hl.innerHTML=hh||'<div style="text-align:center;color:var(--text2);padding:20px;font-size:13px">本月暂无记录</div>';
+  const sd=Object.keys(logByDate).sort().reverse();
+  let hh='';
+  sd.forEach(date=>{
+    const entries=logByDate[date];
+    const items=entries.map(e=>{
+      const s=S.find(x=>x.id===e.sid);
+      if(!s)return null;
+      const m=s.modules[e.mi];
+      if(!m)return null;
+      if(e.t==='b'){return {label:m.lessons[e.li]?m.lessons[e.li].n:'课程',cls:''};}
+      if(e.t==='e'){return {label:m.name+' 课后题',cls:'ex'};}
+      if(e.t==='i'){return {label:m.name+' 强化课',cls:'ex'};}
+      return null;
+    }).filter(Boolean);
+    // Deduplicate
+    const seen=new Set();
+    const unique=items.filter(i=>{const k=i.label;if(seen.has(k))return false;seen.add(k);return true;});
+    hh+=`<div class="history-item">
+      <div class="history-date"><span>${date}</span><span class="count">${unique.length}项</span></div>
+      <div class="history-lessons">${unique.map(i=>`<span class="history-tag ${i.cls}">${i.label}</span>`).join('')}</div>
+    </div>`;
+  });
+  hl.innerHTML=hh||'<div style="text-align:center;color:var(--text2);padding:20px;font-size:13px">本月暂无学习记录</div>';
+}
+
+// ============================================================
+// SHARE: Generate study card image
+// ============================================================
+function getTodayLessons(){
+  const today=getToday();
+  const entries=st.log.filter(l=>l.d===today);
+  const bySubject={};
+  entries.forEach(e=>{
+    const s=S.find(x=>x.id===e.sid);
+    if(!s)return;
+    const m=s.modules[e.mi];
+    if(!m)return;
+    if(!bySubject[s.name])bySubject[s.name]=[];
+    let label;
+    if(e.t==='b')label=m.lessons[e.li]?m.lessons[e.li].n:'课程';
+    else if(e.t==='e')label=m.name+' 课后题';
+    else label=m.name+' 强化课';
+    if(!bySubject[s.name].includes(label))bySubject[s.name].push(label);
+  });
+  return bySubject;
+}
+
+function openShare(){
+  const lessons=getTodayLessons();
+  if(!Object.keys(lessons).length){alert('今天还没有学习记录');return;}
+
+  const canvas=document.getElementById('share-canvas');
+  const ctx=canvas.getContext('2d');
+  const W=750, PAD=40;
+
+  // Calculate height
+  let totalItems=0;
+  Object.values(lessons).forEach(arr=>totalItems+=arr.length);
+  const subjCount=Object.keys(lessons).length;
+  const H=280+subjCount*50+totalItems*32+60;
+
+  canvas.width=W;canvas.height=H;
+  const dpr=2;canvas.width=W*dpr;canvas.height=H*dpr;
+  ctx.scale(dpr,dpr);
+  canvas.style.width=W/2+'px';
+
+  // Background gradient
+  const bg=ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#fef6f0');bg.addColorStop(1,'#fff5ee');
+  ctx.fillStyle=bg;
+  roundRect(ctx,0,0,W,H,0);ctx.fill();
+
+  // Accent bar top
+  const bar=ctx.createLinearGradient(0,0,W,0);
+  bar.addColorStop(0,'#ff8a65');bar.addColorStop(1,'#ff6b6b');
+  ctx.fillStyle=bar;ctx.fillRect(0,0,W,6);
+
+  // Date & Title
+  const today=getToday();
+  const exam=new Date(2026,7,14),now=new Date();now.setHours(0,0,0,0);
+  const daysLeft=Math.ceil((exam-now)/864e5);
+  const sk=streak();
+  const c=countAll();
+
+  ctx.fillStyle='#ff8a65';
+  ctx.font='bold 28px Nunito,PingFang SC,Microsoft YaHei,sans-serif';
+  ctx.fillText('CFA L3 Study Tracker',PAD,50);
+
+  ctx.fillStyle='#999';
+  ctx.font='16px Nunito,PingFang SC,Microsoft YaHei,sans-serif';
+  ctx.fillText(today+'  |  距考试'+daysLeft+'天  |  连续打卡'+sk+'天',PAD,78);
+
+  // Stats bar
+  const statsY=105;
+  ctx.fillStyle='#fff';
+  roundRect(ctx,PAD,statsY,W-PAD*2,55,14);ctx.fill();
+  ctx.fillStyle='#e0e0e0';roundRect(ctx,PAD,statsY,W-PAD*2,55,14);ctx.stroke();
+
+  const stats=[
+    {label:'总进度',val:Math.round((c.dL+c.dE+c.dI)/(c.tL+c.tE+c.tI)*100)+'%'},
+    {label:'基础课',val:c.dL+'/'+c.tL},
+    {label:'今日完成',val:totalItems+'项'},
+  ];
+  const sw=(W-PAD*2)/stats.length;
+  stats.forEach((s,i)=>{
+    const x=PAD+sw*i+sw/2;
+    ctx.fillStyle='#ff8a65';ctx.font='bold 20px Nunito,sans-serif';
+    ctx.textAlign='center';ctx.fillText(s.val,x,statsY+25);
+    ctx.fillStyle='#999';ctx.font='12px Nunito,sans-serif';
+    ctx.fillText(s.label,x,statsY+44);
+  });
+  ctx.textAlign='left';
+
+  // Divider
+  let y=statsY+75;
+  ctx.fillStyle='#ff8a65';
+  ctx.font='bold 22px Nunito,PingFang SC,Microsoft YaHei,sans-serif';
+  ctx.fillText('今日学习内容',PAD,y);
+  y+=8;
+  ctx.strokeStyle='#f0e0d6';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(PAD,y);ctx.lineTo(W-PAD,y);ctx.stroke();
+  y+=20;
+
+  // Lessons by subject
+  Object.entries(lessons).forEach(([subj,items])=>{
+    ctx.fillStyle='#ff8a65';
+    ctx.font='bold 18px Nunito,PingFang SC,Microsoft YaHei,sans-serif';
+    ctx.fillText(subj,PAD,y);
+    y+=8;
+
+    items.forEach(item=>{
+      ctx.fillStyle='#66bb6a';ctx.font='16px Nunito,sans-serif';
+      ctx.fillText('  ✓',PAD,y+14);
+      ctx.fillStyle='#3d3d3d';ctx.font='15px Nunito,PingFang SC,Microsoft YaHei,sans-serif';
+      ctx.fillText(item,PAD+30,y+14);
+      y+=28;
+    });
+    y+=14;
+  });
+
+  // Footer
+  y+=5;
+  ctx.fillStyle='#ccc';ctx.font='12px Nunito,sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText('Generated by CFA L3 Study Tracker',W/2,y);
+  ctx.textAlign='left';
+
+  document.getElementById('share-modal').classList.add('show');
+}
+
+function closeShare(){document.getElementById('share-modal').classList.remove('show');}
+
+function downloadShare(){
+  const canvas=document.getElementById('share-canvas');
+  const link=document.createElement('a');
+  link.download='CFA_L3_Study_'+getToday()+'.png';
+  link.href=canvas.toDataURL('image/png');
+  link.click();
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
 }
 
 // ============================================================
@@ -930,22 +1129,32 @@ function celebrate(msg){
 
 function togL(sid,mi,li){
   const was=st.ch[sid][mi].b[li];
-  st.ch[sid][mi].b[li]=!was;save();render();
+  st.ch[sid][mi].b[li]=!was;
   if(!was){
+    markStudyDay();
+    st.log.push({d:getToday(),sid,mi,li,t:'b'});
     const m=S.find(x=>x.id===sid).modules[mi];
     const done=st.ch[sid][mi].b.filter(Boolean).length;
     if(done===m.lessons.length)celebrate(`${m.name} 基础课全部完成!`);
   }
+  save();render();
 }
-function togE(sid,mi){st.ch[sid][mi].e=!st.ch[sid][mi].e;save();render();}
+function togE(sid,mi){
+  const was=st.ch[sid][mi].e;
+  st.ch[sid][mi].e=!was;
+  if(!was){markStudyDay();st.log.push({d:getToday(),sid,mi,t:'e'});}
+  save();render();
+}
 function togI(sid,mi){
   const was=st.ch[sid][mi].i;
-  st.ch[sid][mi].i=!was;save();render();
+  st.ch[sid][mi].i=!was;
   if(!was){
+    markStudyDay();st.log.push({d:getToday(),sid,mi,t:'i'});
     const s=S.find(x=>x.id===sid);
     const allDone=st.ch[sid].every(m=>m.b.every(Boolean)&&m.e&&m.i);
     if(allDone)celebrate(`${s.name} 全部完成! 太棒了!`);
   }
+  save();render();
 }
 
 function toggleTimer(){
@@ -955,7 +1164,7 @@ function toggleTimer(){
     const hours=timerElapsed/3600;
     if(hours>=0.01){
       st.rec.push({d:getToday(),s:document.getElementById('timer-sel').value,h:Math.round(hours*100)/100});
-      save();
+      markStudyDay();save();
     }
     timerElapsed=0;timerStart=null;
     btn.innerHTML='&#x25B6; 开始学习';btn.classList.remove('running');
@@ -987,6 +1196,7 @@ function saveManual(){
   const date=document.getElementById('m-date').value;
   if(!hours||hours<=0||!date)return alert('请填写完整');
   st.rec.push({d:date,s:subj,h:Math.round(hours*100)/100});
+  if(!st.days.includes(date))st.days.push(date);
   save();closeModal();render();
 }
 function delRec(date){if(!confirm(`删除 ${date} 的所有记录？`))return;st.rec=st.rec.filter(r=>r.d!==date);save();render();renderCalendar();}
