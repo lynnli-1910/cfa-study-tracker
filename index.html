@@ -12,7 +12,6 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>CFA L3 Study Tracker</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
 :root {
   --bg: #fef6f0;
   --card: #ffffff;
@@ -31,7 +30,7 @@
 }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body {
-  font-family: 'Nunito', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
   background: var(--bg); color: var(--text);
   min-height:100vh; max-width:480px; margin:0 auto;
   padding-bottom:80px; overflow-x:hidden;
@@ -1212,6 +1211,7 @@ function init(){
 document.addEventListener('visibilitychange',()=>{if(timerStart&&!document.hidden)timerElapsed=(Date.now()-timerStart)/1000;});
 
 init();
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js');}
 </script>
 </body>
 </html>
