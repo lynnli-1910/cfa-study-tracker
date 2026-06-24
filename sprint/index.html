@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#ff8a65">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="icon" href="./favicon.ico">
+<title>CFA L3 冲刺打卡</title>
+<style>
+:root{--bg:#fef6f0;--card:#fff;--card2:#fff5ee;--accent:#ff8a65;--accent2:#ff6b6b;--green:#66bb6a;--green2:#e8f5e9;--blue:#64b5f6;--text:#3d3d3d;--text2:#999;--border:#f0e0d6;--shadow:0 2px 12px rgba(0,0,0,.06);}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:480px;margin:0 auto;padding-bottom:78px;overflow-x:hidden;}
+.header{padding:22px 20px 4px;text-align:center;}
+.header h1{font-size:21px;font-weight:800;color:var(--accent);}
+.header .sub{font-size:13px;color:var(--text2);margin-top:3px;}
+.exam-cd{margin-top:12px;background:linear-gradient(135deg,#ff8a65,#ff6b6b);color:#fff;border-radius:16px;padding:12px 18px;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;box-shadow:0 4px 15px rgba(255,138,101,.3);}
+.exam-cd .big{font-size:30px;}
+.phase-tag{margin:12px 20px 0;background:var(--card);border-radius:14px;padding:10px 14px;box-shadow:var(--shadow);font-size:13px;display:flex;justify-content:space-between;align-items:center;}
+.phase-tag b{color:var(--accent);}
+.phase-tag .date{color:var(--text2);font-size:11px;}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:14px 20px;}
+.stat-card{background:var(--card);border-radius:16px;padding:14px 8px;text-align:center;box-shadow:var(--shadow);}
+.stat-card .icon{font-size:22px;}
+.stat-card .num{font-size:17px;font-weight:800;margin:3px 0;}
+.stat-card .label{font-size:11px;color:var(--text2);}
+.sc1 .num{color:var(--accent2);}.sc2 .num{color:var(--blue);}.sc3 .num{color:var(--green);}
+.ring-section{display:flex;align-items:center;justify-content:center;gap:22px;padding:6px 20px 14px;}
+.ring-box{position:relative;width:120px;height:120px;}
+.ring-box svg{transform:rotate(-90deg);width:120px;height:120px;}
+.ring-bg{fill:none;stroke:#fce4d6;stroke-width:9;}
+.ring-fg{fill:none;stroke:url(#grad1);stroke-width:9;stroke-linecap:round;transition:stroke-dashoffset .8s;}
+.ring-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.ring-center .pct{font-size:26px;font-weight:800;color:var(--accent);}
+.ring-center .subt{font-size:10px;color:var(--text2);}
+.ring-info{font-size:13px;line-height:2.1;}
+.ring-info .d{font-weight:700;}
+.ring-info .d.a{color:var(--accent2);}.ring-info .d.b{color:var(--blue);}.ring-info .d.c{color:var(--green);}
+.quote{margin:0 20px 14px;padding:14px 16px;background:linear-gradient(135deg,#fff5ee,#fce4ec);border-radius:16px;text-align:center;}
+.quote .t{font-size:13px;font-style:italic;line-height:1.6;}
+.quote .a{font-size:11px;color:var(--text2);margin-top:4px;}
+.link-card{margin:0 20px 14px;background:var(--card);border-radius:14px;padding:13px 16px;box-shadow:var(--shadow);font-size:13px;color:var(--text2);line-height:1.7;}
+.link-card b{color:var(--text);}
+.subject-list{padding:10px 20px;}
+.subj-card{background:var(--card);border-radius:16px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);animation:fadeIn .3s;}
+.subj-card.done{opacity:.6;}
+.subj-top{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.subj-name{font-size:15px;font-weight:700;}
+.subj-tag{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:700;flex-shrink:0;}
+.tag-w{background:#fff3e0;color:#ff8a65;}
+.subj-bar{margin-top:10px;height:8px;background:#fce4d6;border-radius:4px;overflow:hidden;}
+.subj-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#ff8a65,#66bb6a);transition:width .4s;}
+.subj-meta{display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--text2);}
+.subj-meta .cnt{font-weight:700;color:var(--accent);}
+.counter{display:flex;align-items:center;gap:6px;margin-top:12px;justify-content:center;}
+.counter button{flex:1;border-radius:10px;padding:9px 0;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--card2);color:var(--text);border:1.5px solid var(--border);transition:transform .1s;}
+.counter button:active{transform:scale(.93);}
+.counter button.plus{background:linear-gradient(135deg,#ff8a65,#ff6b6b);color:#fff;border:none;}
+.counter button.minus{color:var(--accent2);}
+.counter .val{flex:1.4;text-align:center;font-size:16px;font-weight:800;color:var(--accent);}
+.row2{display:flex;gap:6px;margin-top:6px;}
+.row2 button{flex:1;border-radius:10px;padding:7px 0;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;background:#fff;border:1.5px solid var(--border);color:var(--text2);}
+.row2 button.full{color:var(--green);border-color:#c8e6c9;}
+.module-card{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:10px;animation:fadeIn .3s;}
+.module-header{padding:14px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;gap:8px;}
+.module-header .name{font-size:15px;font-weight:700;flex:1;}
+.module-header .badge{font-size:11px;color:#fff;background:var(--accent);padding:3px 10px;border-radius:20px;font-weight:700;}
+.module-header .badge.done{background:var(--green);}
+.module-header .arrow{color:var(--text2);font-size:14px;transition:transform .2s;}
+.module-header .arrow.open{transform:rotate(90deg);}
+.module-body{display:none;padding:0 16px 10px;}
+.module-body.show{display:block;}
+.lesson-item{display:flex;align-items:center;padding:9px 0;border-bottom:1px solid #fef0e8;gap:10px;}
+.lesson-item:last-child{border-bottom:none;}
+.lesson-cb{width:24px;height:24px;border-radius:8px;border:2px solid #e0d0c8;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;color:transparent;transition:all .15s;}
+.lesson-cb.checked{background:var(--green);border-color:var(--green);color:#fff;}
+.lesson-name{font-size:13px;flex:1;line-height:1.4;}
+.lesson-name.checked{color:var(--text2);text-decoration:line-through;}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--card);border-top:1px solid var(--border);display:flex;padding:6px 0;padding-bottom:max(6px,env(safe-area-inset-bottom));z-index:100;box-shadow:0 -2px 10px rgba(0,0,0,.04);}
+.nav-item{flex:1;text-align:center;padding:6px 0;cursor:pointer;border:none;background:none;color:var(--text2);font-size:11px;font-weight:600;font-family:inherit;}
+.nav-item.active{color:var(--accent);}
+.nav-icon{font-size:21px;display:block;margin-bottom:1px;}
+.page{display:none;}.page.active{display:block;}
+.pagehdr{padding:20px 20px 6px;}
+.pagehdr h1{font-size:20px;font-weight:800;color:var(--accent);}
+.pagehdr .s{font-size:12px;color:var(--text2);margin-top:3px;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#66bb6a,#4caf50);color:#fff;padding:10px 20px;border-radius:20px;font-size:14px;font-weight:700;z-index:300;display:none;box-shadow:0 4px 15px rgba(102,187,106,.4);}
+</style>
+</head>
+<body>
+<svg width="0" height="0"><defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff8a65"/><stop offset="100%" stop-color="#66bb6a"/></linearGradient></defs></svg>
+<div id="toast" class="toast"></div>
+
+<div id="page-home" class="page active">
+  <div class="header">
+    <h1>CFA L3 冲刺打卡</h1>
+    <div class="sub" id="home-sub"></div>
+    <div class="exam-cd">距考试 <span class="big" id="cd">0</span> 天</div>
+  </div>
+  <div class="phase-tag"><span>当前阶段：<b id="phase-name"></b></span><span class="date" id="phase-date"></span></div>
+  <div class="stats">
+    <div class="stat-card sc1"><div class="icon">&#x270F;&#xFE0F;</div><div class="num" id="st-jdt">0/616</div><div class="label">经典题</div></div>
+    <div class="stat-card sc2"><div class="icon">&#x1F3AC;</div><div class="num" id="st-zfx">0/102</div><div class="label">总复习课</div></div>
+    <div class="stat-card sc3"><div class="icon">&#x1F4DD;</div><div class="num" id="st-mock">0/4</div><div class="label">Mock套数</div></div>
+  </div>
+  <div class="ring-section">
+    <div class="ring-box">
+      <svg viewBox="0 0 120 120"><circle class="ring-bg" cx="60" cy="60" r="50"/><circle class="ring-fg" id="ring" cx="60" cy="60" r="50" stroke-dasharray="314.2" stroke-dashoffset="314.2"/></svg>
+      <div class="ring-center"><div class="pct" id="ring-pct">0%</div><div class="subt">总进度</div></div>
+    </div>
+    <div class="ring-info">
+      <div>&#x270F;&#xFE0F; 经典题 <span class="d a" id="ri-j">0</span>题</div>
+      <div>&#x1F3AC; 总复习 <span class="d b" id="ri-z">0</span>节</div>
+      <div>&#x1F4DD; Mock <span class="d c" id="ri-m">0</span>项</div>
+    </div>
+  </div>
+  <div class="quote"><div class="t" id="q-t"></div><div class="a" id="q-a"></div></div>
+  <div class="link-card">
+    &#x1F4CC; <b>三阶段：</b>① 经典题强化 7/5–7/22 → ② 总复习班2x 7/23–8/4 → ③ Mock冲刺 8/5–8/16<br>
+    详细到天的排期见同文件夹 <b>复习排期_7.5-8.17.md</b> / <b>复习排期追踪表.xlsx</b>
+  </div>
+</div>
+
+<div id="page-jdt" class="page">
+  <div class="pagehdr"><h1>&#x270F;&#xFE0F; 经典题（616题）</h1><div class="s">自己刷，错题问 Claude · 点 +/- 记录做题数</div></div>
+  <div class="subject-list" id="jdt-list"></div>
+</div>
+
+<div id="page-zfx" class="page">
+  <div class="pagehdr"><h1>&#x1F3AC; 总复习班（102节·2x）</h1><div class="s">讲题不听 · 点开科目逐节打勾</div></div>
+  <div class="subject-list" id="zfx-list"></div>
+</div>
+
+<div id="page-mock" class="page">
+  <div class="pagehdr"><h1>&#x1F4DD; Mock 冲刺</h1><div class="s">2026四套为主线，2025两套有余力再补</div></div>
+  <div class="subject-list" id="mock-list"></div>
+</div>
+
+<div class="bottom-nav">
+  <button class="nav-item active" onclick="showPage('home',this)"><span class="nav-icon">&#x1F3E0;</span>首页</button>
+  <button class="nav-item" onclick="showPage('jdt',this)"><span class="nav-icon">&#x270F;&#xFE0F;</span>经典题</button>
+  <button class="nav-item" onclick="showPage('zfx',this)"><span class="nav-icon">&#x1F3AC;</span>总复习</button>
+  <button class="nav-item" onclick="showPage('mock',this)"><span class="nav-icon">&#x1F4DD;</span>Mock</button>
+</div>
+
+<script>
+const JDT=[["cme", "CME 资本市场预期", "15-20%", 50], ["aa", "资产配置 AA", "15-20%", 56], ["deriv", "衍生 Derivatives", "10-15%", 61], ["ips_p", "个人 IPS", "15-20%", 25], ["ips_i", "机构 IPS", "15-20%", 27], ["eq_c", "权益 Equity·Core", "15-20%", 16], ["fi_c", "固收 Fixed Income·Core", "15-20%", 27], ["alt", "另类 Alternative", "15-20%", 18], ["tr_c", "交易 Trading·Core", "15-20%", 20], ["perf", "绩效评估 Performance", "5-10%", 40], ["gips", "GIPS", "5-10%", 23], ["eth", "Ethics 道德", "10-15%", 111], ["eq_p", "权益 Equity·Pathway", "15-20%", 58], ["fi_p", "固收 Fixed Income·Pathway", "15-20%", 70], ["tr_p", "交易 Trading·Pathway", "15-20%", 14]];
+const ZFX=[{"id": "cme", "name": "CME 资本市场预期", "lessons": ["Introduction", "Framework and Challenges", "Analysis of Economic Growth&Approaches to Economic Forecasting", "Business Cycle Analysis", "Analysis of Monetary and Fiscal Policy（1）", "Analysis of Monetary and Fiscal Policy（2）&International Interactions", "Forecasting Fixed-Income Returns", "Forecasting Equity Returns", "Forecasting Real Estate Returns", "Forecasting Exchange Rates", "Forecasting Volatility", "Adjusting A Global Portfolio"]}, {"id": "aa", "name": "资产配置 AA", "lessons": ["Module 3 Overview of Asset Allocation", "Module 4 Principles of Asset Allocation—Asset-only Asset Allocations (1)", "Module 4 Principles of Asset Allocation—Asset-only Asset Allocations (2)", "Module 4 Principles of Asset Allocation—Liability-relative & Goals-Based Asset Allocations", "Module 5 Asset Allocation with Real-world Constrains"]}, {"id": "deriv", "name": "衍生 Derivatives", "lessons": ["Introduction", "Option Strategies (1)", "Option Strategies (2)", "Implied Volatility & Volatility Skew", "Swaps, Forwards, and Futures Strategies (1)", "Swaps, Forwards, and Futures Strategies (2)", "Swaps, Forwards, and Futures Strategies (3)", "Currency Management (1)", "Currency Management (2)"]}, {"id": "ips_p", "name": "个人 IPS", "lessons": ["Sources of Global Wealth", "Components of wealth & Net worth", "Economic balance sheet", "Life-cycle View of Human Capital", "Objectives", "Risks", "Taxes on Investment Income", "The Impact of Accrual Taxes on Investment Returns", "Impact of Deferral Taxes on Investment Returns", "The Impact of Basis on Capital Gains", "The influence of inflation on investment returns", "Institutional vs Individual Investors", "Individual Investors And IPS"]}, {"id": "ips_iC", "name": "机构 IPS (Core)", "lessons": ["Module 5 Portfolio Management for Institutional Investors （1）", "Module 5 Portfolio Management for Institutional Investors （2）", "Module 5 Portfolio Management for Institutional Investors （3）", "Module 5 Portfolio Management for Institutional Investors （4）", "Module 5 Portfolio Management for Institutional Investors （5）", "Module 5 Portfolio Management for Institutional Investors （6）", "Module 7  Case Study in Portfolio Management: Institutional (SWF)（1）", "Module 7  Case Study in Portfolio Management: Institutional (SWF)（2）", "Module 7  Case Study in Portfolio Management: Institutional (SWF)（3）"]}, {"id": "ips_iP", "name": "机构 IPS (Pathway 案例)", "lessons": ["Liquidity Profiling and Time-to-Cash Tables", "Rebalancing and Commitment Strategies", "Stress Testing Analyses & Derivatives", "Earning an Illiquidity Premium", "Spending Policy & Investment Objective", "1. Quadrivium University Investment Company", "2. Investment Strategy: Background and Evolution", "3. Strategic Asset Allocation", "new example: COVID-19", "4. Liquidity Management", "5. Asset Manager Selection", "6. Tactical Asset Allocation (1)-(2)", "6. Tactical Asset Allocation (3)", "7. Asset Allocation Rebalancing", "8. ESG Integration"]}, {"id": "eq", "name": "权益 Equity", "lessons": ["Review of M1 01", "Review of M1 02", "Review of M1 01", "Review of M1 02", "Review of M2", "Review of M3 01", "Review of M3 02", "Review of M3 03", "Review of M3 04"]}, {"id": "fi", "name": "固收 Fixed Income", "lessons": ["Module 1 Overview of Fixed-Income Portfolio Management (01)", "Module 1 Overview of Fixed-Income Portfolio Management (02)", "Module 1 Liability-driven and Index-based Strategies (01)", "Module 1 Liability-driven and Index-based Strategies (02)", "Module 1 Liability-driven and Index-based Strategies (03)", "Module 2 Yield Curve Strategy", "Module 3 Fixed-Income Active Management: Credit Strategies (01)", "Module 3 Fixed-Income Active Management: Credit Strategies (02)"]}, {"id": "alt", "name": "另类 Alternative", "lessons": ["Role Of Different Investments & Asset Classification", "Investment considerations & Suitability Considerations", "Asset Allocation Approaches & Liquidity Planning & Monitoring the Investment Program"]}, {"id": "tr", "name": "交易 Trading", "lessons": ["Trading Costs and Electronic Markets", "Motivations To Trade & Trade Strategy Inputs", "Reference Prices", "Trade Implementation Choices & Algorithmic Trading", "Comparison of Markets", "Implementation Shortfall & Expanded Implementation Shortfall", "Trade cost & Trade Governance"]}, {"id": "perf", "name": "绩效评估 Performance", "lessons": ["Performance Attribution", "Micro Attribution(1)", "Micro Attribution(2)", "Macro Attribution & Risk Attribution", "Benchmark", "Performance Appraisal", "Manager Selection Process Overview", "Quantitative Elements & Qualitative Elements"]}, {"id": "gips", "name": "GIPS", "lessons": ["Introduction", "1.Fundamental of Compliance", "2.Input Data and Calculation Methodology", "Section 3 & 4 and sample"]}];
+const MOCK=[{"id": "m1", "name": "Mock 1 · 2026", "tasks": ["Session 1 限时", "Session 2 限时", "精订正+错题"]}, {"id": "m2", "name": "Mock 2 · 2026", "tasks": ["Session 1 限时", "Session 2 限时", "精订正+错题"]}, {"id": "mA", "name": "Mock A · 2026", "tasks": ["Session 1 限时", "Session 2 限时", "精订正+错题"]}, {"id": "mB", "name": "Mock B · 2026", "tasks": ["Session 1 限时", "Session 2 限时", "精订正+错题"]}, {"id": "m25a", "name": "Mock 1 · 2025 (补充)", "tasks": ["Session 1 限时", "Session 2 限时", "精订正+错题"]}, {"id": "m25b", "name": "Mock 2 · 2025 (补充)", "tasks": ["Session 1 限时", "Session 2 限时", "精订正+错题"]}];
+
+const MAIN_MOCKS=['m1','m2','mA','mB'];
+const JDT_TOTAL=JDT.reduce((s,x)=>s+x[3],0);
+const ZFX_TOTAL=ZFX.reduce((s,x)=>s+x.lessons.length,0);
+const EXAM=new Date(2026,7,17);
+const DB='cfa3_sprint_v1';
+let st=load();
+function defaults(){
+  const j={},z={},m={};
+  JDT.forEach(x=>j[x[0]]=0);
+  ZFX.forEach(x=>z[x.id]=x.lessons.map(()=>false));
+  MOCK.forEach(x=>m[x.id]=x.tasks.map(()=>false));
+  return {jdt:j,zfx:z,mock:m,days:[],ver:1};
+}
+function load(){try{const r=localStorage.getItem(DB);if(r){return migrate(JSON.parse(r));}}catch(e){}return defaults();}
+function migrate(s){const d=defaults();
+  s.jdt=Object.assign(d.jdt,s.jdt||{});
+  if(!s.zfx)s.zfx={};ZFX.forEach(x=>{if(!s.zfx[x.id]||s.zfx[x.id].length!==x.lessons.length)s.zfx[x.id]=x.lessons.map((_,i)=>(s.zfx[x.id]&&s.zfx[x.id][i])||false);});
+  if(!s.mock)s.mock={};MOCK.forEach(x=>{if(!s.mock[x.id]||s.mock[x.id].length!==x.tasks.length)s.mock[x.id]=x.tasks.map((_,i)=>(s.mock[x.id]&&s.mock[x.id][i])||false);});
+  if(!s.days)s.days=[];s.ver=1;return s;}
+function save(){localStorage.setItem(DB,JSON.stringify(st));}
+function today(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function markDay(){const t=today();if(!st.days.includes(t))st.days.push(t);}
+function toast(m){const e=document.getElementById('toast');e.textContent=m;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',1400);}
+
+const QUOTES=[['The pain of discipline is far less than the pain of regret.',''],['不积跬步，无以至千里。','荀子'],['把每一天当作最后的冲刺。',''],['你不需要很厉害才能开始，你需要开始才能很厉害。',''],['每多做一道题，就离 Charter 更近一步。',''],['Consistency transforms average into excellence.',''],['种一棵树最好的时间是十年前，其次是现在。',''],['坚持住，8月17见分晓。','']];
+
+function jdtDone(){return JDT.reduce((s,x)=>s+(st.jdt[x[0]]||0),0);}
+function zfxDone(){return ZFX.reduce((s,x)=>s+st.zfx[x.id].filter(Boolean).length,0);}
+function mockTaskDone(){return MOCK.reduce((s,x)=>s+st.mock[x.id].filter(Boolean).length,0);}
+function mockTaskTotal(){return MOCK.reduce((s,x)=>s+x.tasks.length,0);}
+function mocksFull(){return MAIN_MOCKS.filter(id=>st.mock[id].every(Boolean)).length;}
+
+function phaseInfo(){
+  const n=new Date();n.setHours(0,0,0,0);
+  const d=(m,day)=>new Date(2026,m,day);
+  if(n<=d(6,22))return['① 经典题强化','7/5 – 7/22'];
+  if(n<=d(7,4))return['② 总复习班2x + 巩固','7/23 – 8/4'];
+  if(n<d(7,17))return['③ Mock冲刺 + 查漏','8/5 – 8/16'];
+  return['🎯 考试就在今天','8/17'];
+}
+
+function renderHome(){
+  const n=new Date();n.setHours(0,0,0,0);
+  document.getElementById('cd').textContent=Math.max(0,Math.ceil((EXAM-n)/864e5));
+  const jd=jdtDone(),zd=zfxDone(),md=mockTaskDone();
+  document.getElementById('st-jdt').textContent=jd+'/'+JDT_TOTAL;
+  document.getElementById('st-zfx').textContent=zd+'/'+ZFX_TOTAL;
+  document.getElementById('st-mock').textContent=mocksFull()+'/4';
+  document.getElementById('ri-j').textContent=jd;
+  document.getElementById('ri-z').textContent=zd;
+  document.getElementById('ri-m').textContent=md;
+  const total=JDT_TOTAL+ZFX_TOTAL+mockTaskTotal(),done=jd+zd+md;
+  const pct=total?done/total:0,circ=2*Math.PI*50;
+  document.getElementById('ring').style.strokeDashoffset=circ*(1-pct);
+  document.getElementById('ring-pct').textContent=Math.round(pct*100)+'%';
+  const ph=phaseInfo();
+  document.getElementById('phase-name').textContent=ph[0];
+  document.getElementById('phase-date').textContent=ph[1];
+  const q=QUOTES[new Date().getDate()%QUOTES.length];
+  document.getElementById('q-t').textContent='“'+q[0]+'”';
+  document.getElementById('q-a').textContent=q[1]?'— '+q[1]:'';
+  document.getElementById('home-sub').textContent='已坚持打卡 '+st.days.length+' 天 · 加油！';
+}
+
+function renderJDT(){
+  const wrap=document.getElementById('jdt-list');wrap.innerHTML='';
+  JDT.forEach(x=>{
+    const id=x[0],name=x[1],w=x[2],tot=x[3];const done=st.jdt[id]||0;const pct=Math.round(done/tot*100);
+    const c=document.createElement('div');c.className='subj-card'+(done>=tot?' done':'');
+    c.innerHTML=
+      '<div class="subj-top"><div class="subj-name">'+name+'</div><div class="subj-tag tag-w">'+w+'</div></div>'+
+      '<div class="subj-bar"><div class="subj-bar-fill" style="width:'+pct+'%"></div></div>'+
+      '<div class="subj-meta"><span>进度 '+pct+'%</span><span class="cnt">'+done+' / '+tot+' 题</span></div>'+
+      '<div class="counter">'+
+        '<button class="minus" onclick="addQ(\''+id+'\',-1)">−1</button>'+
+        '<button class="minus" onclick="addQ(\''+id+'\',-5)">−5</button>'+
+        '<div class="val">'+done+'</div>'+
+        '<button class="plus" onclick="addQ(\''+id+'\',1)">+1</button>'+
+        '<button class="plus" onclick="addQ(\''+id+'\',5)">+5</button>'+
+        '<button class="plus" onclick="addQ(\''+id+'\',10)">+10</button>'+
+      '</div>'+
+      '<div class="row2"><button onclick="setQ(\''+id+'\',0)">清零</button><button class="full" onclick="setQ(\''+id+'\','+tot+')">全做完 ✓</button></div>';
+    wrap.appendChild(c);
+  });
+}
+function addQ(id,n){const x=JDT.find(a=>a[0]===id);let v=(st.jdt[id]||0)+n;v=Math.max(0,Math.min(x[3],v));st.jdt[id]=v;if(n>0)markDay();save();renderJDT();renderHome();if(v>=x[3]&&n>0)toast(x[1]+' 全部完成！🎉');}
+function setQ(id,v){st.jdt[id]=v;if(v>0)markDay();save();renderJDT();renderHome();if(v>0)toast('已标记完成 ✓');}
+
+function renderZFX(){
+  const wrap=document.getElementById('zfx-list');wrap.innerHTML='';
+  ZFX.forEach(x=>{
+    const done=st.zfx[x.id].filter(Boolean).length,tot=x.lessons.length,full=done>=tot;
+    const c=document.createElement('div');c.className='module-card';
+    let body='';x.lessons.forEach((ls,i)=>{const ck=st.zfx[x.id][i];
+      body+='<div class="lesson-item"><div class="lesson-cb'+(ck?' checked':'')+'" onclick="tglZ(\''+x.id+'\','+i+')">'+(ck?'✓':'')+'</div><div class="lesson-name'+(ck?' checked':'')+'">'+(i+1)+'. '+ls+'</div></div>';});
+    c.innerHTML='<div class="module-header" onclick="this.nextElementSibling.classList.toggle(\'show\');this.querySelector(\'.arrow\').classList.toggle(\'open\')">'+
+      '<div class="name">'+x.name+'</div><div class="badge'+(full?' done':'')+'">'+done+'/'+tot+'</div><div class="arrow">▶</div></div>'+
+      '<div class="module-body">'+body+'<div class="row2" style="margin-top:8px"><button onclick="allZ(\''+x.id+'\',false)">全清</button><button class="full" onclick="allZ(\''+x.id+'\',true)">全听完 ✓</button></div></div>';
+    wrap.appendChild(c);
+  });
+}
+function tglZ(id,i){st.zfx[id][i]=!st.zfx[id][i];if(st.zfx[id][i])markDay();save();renderZFX();renderHome();}
+function allZ(id,v){st.zfx[id]=st.zfx[id].map(()=>v);if(v)markDay();save();renderZFX();renderHome();}
+
+function renderMock(){
+  const wrap=document.getElementById('mock-list');wrap.innerHTML='';
+  MOCK.forEach(x=>{
+    const done=st.mock[x.id].filter(Boolean).length,tot=x.tasks.length,full=done>=tot;
+    const c=document.createElement('div');c.className='subj-card';
+    let body='';x.tasks.forEach((t,i)=>{const ck=st.mock[x.id][i];
+      body+='<div class="lesson-item"><div class="lesson-cb'+(ck?' checked':'')+'" onclick="tglM(\''+x.id+'\','+i+')">'+(ck?'✓':'')+'</div><div class="lesson-name'+(ck?' checked':'')+'">'+t+'</div></div>';});
+    c.innerHTML='<div class="subj-top"><div class="subj-name">'+x.name+'</div><div class="subj-tag '+(full?'':'tag-w')+'" style="'+(full?'background:#e8f5e9;color:#4caf50':'')+'">'+done+'/'+tot+'</div></div>'+
+      '<div style="margin-top:6px">'+body+'</div>';
+    wrap.appendChild(c);
+  });
+}
+function tglM(id,i){st.mock[id][i]=!st.mock[id][i];if(st.mock[id][i])markDay();save();renderMock();renderHome();}
+
+function showPage(p,el){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));if(el)el.classList.add('active');window.scrollTo(0,0);}
+
+renderHome();renderJDT();renderZFX();renderMock();
+if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){
+  window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});
+}
+</script>
+</body>
+</html>

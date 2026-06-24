@@ -1,0 +1,15 @@
+{
+  "name": "CFA L3 冲刺打卡",
+  "short_name": "CFA冲刺",
+  "description": "CFA Level 3 考前冲刺：经典题 / 总复习 / Mock 进度打卡",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fef6f0",
+  "theme_color": "#ff8a65",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

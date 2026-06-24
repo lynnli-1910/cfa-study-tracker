@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff8a65"/>
+      <stop offset="100%" stop-color="#ff6b6b"/>
+    </linearGradient>
+    <linearGradient id="book" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#fce4ec"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded square background -->
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+  <!-- Open book -->
+  <g transform="translate(256,240)">
+    <!-- Left page -->
+    <path d="M-12,-80 L-12,60 Q-12,70 -22,72 L-130,90 Q-140,92 -140,82 L-140,-60 Q-140,-70 -130,-72 L-22,-88 Q-12,-90 -12,-80Z" fill="url(#book)" opacity="0.95"/>
+    <!-- Right page -->
+    <path d="M12,-80 L12,60 Q12,70 22,72 L130,90 Q140,92 140,82 L140,-60 Q140,-70 130,-72 L22,-88 Q12,-90 12,-80Z" fill="url(#book)" opacity="0.95"/>
+    <!-- Spine -->
+    <path d="M-12,-80 Q0,-95 12,-80 L12,60 Q0,55 -12,60Z" fill="#fff" opacity="0.6"/>
+    <!-- Left page lines -->
+    <line x1="-110" y1="-45" x2="-35" y2="-55" stroke="#ffab91" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+    <line x1="-110" y1="-20" x2="-35" y2="-30" stroke="#ffab91" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+    <line x1="-110" y1="5" x2="-35" y2="-5" stroke="#ffab91" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+    <line x1="-110" y1="30" x2="-35" y2="20" stroke="#ffab91" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+    <line x1="-110" y1="55" x2="-35" y2="45" stroke="#ffab91" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+    <!-- Right page checkmarks -->
+    <g stroke="#66bb6a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <polyline points="35,-55 42,-48 55,-62" opacity="0.7"/>
+      <polyline points="35,-30 42,-23 55,-37" opacity="0.7"/>
+      <polyline points="35,-5 42,2 55,-12" opacity="0.7"/>
+    </g>
+    <line x1="65" y1="-55" x2="115" y2="-60" stroke="#ffab91" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+    <line x1="65" y1="-30" x2="115" y2="-35" stroke="#ffab91" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+    <line x1="65" y1="-5" x2="115" y2="-10" stroke="#ffab91" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+    <!-- Empty checkboxes for remaining -->
+    <rect x="33" y="18" width="14" height="14" rx="3" stroke="#ffab91" stroke-width="3" fill="none" opacity="0.5" transform="rotate(-5,40,25)"/>
+    <rect x="33" y="43" width="14" height="14" rx="3" stroke="#ffab91" stroke-width="3" fill="none" opacity="0.5" transform="rotate(-5,40,50)"/>
+  </g>
+  <!-- CFA text at bottom -->
+  <text x="256" y="390" text-anchor="middle" font-family="'Nunito','Helvetica Neue',Arial,sans-serif" font-size="56" font-weight="800" fill="#fff" letter-spacing="8">CFA L3</text>
+  <!-- Progress bar -->
+  <rect x="156" y="408" width="200" height="8" rx="4" fill="rgba(255,255,255,0.3)"/>
+  <rect x="156" y="408" width="120" height="8" rx="4" fill="#fff"/>
+  <!-- Small star accent -->
+  <g transform="translate(400,100)" fill="#ffc107" opacity="0.8">
+    <polygon points="0,-18 5,-6 18,-6 8,3 12,16 0,9 -12,16 -8,3 -18,-6 -5,-6"/>
+  </g>
+</svg>
